@@ -59,6 +59,16 @@ function initializePlugin(api) {
     return helper.h("div.post-retort-container", retort_widgets);
   });
 
+  api.modifyClass("controller:preferences/notifications", {
+    pluginId: "retort",
+    actions: {
+      save() {
+        this.get('saveAttrNames').push('custom_fields')
+        this._super()
+      }
+    }
+  })
+
   api.addPostClassesCallback((attrs) => {
     if (!Retort.disableShowForPost(attrs.id)) {
       return ["retort"];
