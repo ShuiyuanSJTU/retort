@@ -44,8 +44,7 @@ function initializePlugin(api) {
     const retort_widgets = retorts.map(({ emoji, emojiUrl, usernames }) => {
       var displayUsernames = usernames;
       // check if hide_ignored_retorts is enabled
-      if (!(currentUser &&
-        (currentUser.trust_level == 4 || currentUser.staff))) {
+      if (currentUser?.custom_fields?.hide_ignored_retorts) {
         const ignoredUsers = new Set(currentUser.ignored_users);
         displayUsernames = usernames.filter((username) => {
           return !ignoredUsers.has(username);
