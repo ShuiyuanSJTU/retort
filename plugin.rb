@@ -26,9 +26,9 @@ after_initialize do
   require_relative "app/controllers/retorts_controller.rb"
   require_relative "app/models/retort.rb"
 
-  DiscoursePluginRegistry.serialized_current_user_fields << 'hide_ignored_users'
-  User.register_custom_field_type 'hide_ignored_users', :boolean
-  register_editable_user_custom_field :hide_ignored_users
+  DiscoursePluginRegistry.serialized_current_user_fields << 'hide_ignored_retorts'
+  User.register_custom_field_type 'hide_ignored_retorts', :boolean
+  register_editable_user_custom_field :hide_ignored_retorts
 
   DiscourseRetort::Engine.routes.draw do
     post "/:post_id" => "retorts#update"
