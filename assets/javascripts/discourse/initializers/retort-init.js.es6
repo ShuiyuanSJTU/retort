@@ -43,7 +43,7 @@ function initializePlugin(api) {
       .sort((a, b) => a.emoji.localeCompare(b.emoji));
     const retort_widgets = retorts.map(({ emoji, emojiUrl, usernames }) => {
       var displayUsernames = usernames;
-      // staff will see all users
+      // check if hide_ignored_retorts is enabled
       if (!(currentUser &&
         (currentUser.trust_level == 4 || currentUser.staff))) {
         const ignoredUsers = new Set(currentUser.ignored_users);

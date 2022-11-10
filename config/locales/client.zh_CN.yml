@@ -2,7 +2,7 @@ zh_CN:
   js:
     retort:
       retort: '表情插件'
-      hide_ignored_users: '不显示被屏蔽用户的表情'
+      hide_ignored_retorts: '不显示被屏蔽用户的表情'
       title: '对此帖子添加一个表情'
       section:
         title: "推荐"
