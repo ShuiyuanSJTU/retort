@@ -31,8 +31,8 @@ export default createWidget("retort-toggle", {
 
   buildKey: (attrs) => `retort-toggle-${attrs.post.id}-${attrs.emoji}-${attrs.usernames.length}`,
 
-  defaultState({ emoji, post, usernames, emojiUrl }) {
-    return { emoji, post, usernames, emojiUrl };
+  defaultState({ emoji, post, usernames, emojiUrl, currentUser}) {
+    return { emoji, post, usernames, emojiUrl, currentUser};
   },
 
   buildClasses(attrs) {
@@ -43,8 +43,18 @@ export default createWidget("retort-toggle", {
 
   click() {
     const { post, emoji } = this.state;
-    Retort.updateRetort(post, emoji);
+    Retort.updateRetort(post, emoji).then(updateWidget);
   },
+
+  updateWidget() {
+    const index = this.state.usernames.indexOf(this.state.urrentUser.username);
+    if (index > -1) { 
+      array.splice(index, 1); 
+    } else {
+      this.state.usernames.push(this.state.urrentUser.username);
+    }
+    this.scheduleRerender()
+  }
 
   html(attrs) {
     const { emoji, usernames, emojiUrl } = this.state;
