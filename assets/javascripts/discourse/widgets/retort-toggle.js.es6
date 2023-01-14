@@ -54,7 +54,7 @@ export default createWidget("retort-toggle", {
       this.state.usernames.push(this.state.urrentUser.username);
     }
     this.scheduleRerender()
-  }
+  },
 
   html(attrs) {
     const { emoji, usernames, emojiUrl } = this.state;
