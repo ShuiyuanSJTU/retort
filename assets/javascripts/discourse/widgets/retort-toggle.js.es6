@@ -47,7 +47,7 @@ export default createWidget("retort-toggle", {
   },
 
   updateWidget() {
-    const index = this.state.usernames.indexOf(this.state.urrentUser.username);
+    const index = this.state.usernames.indexOf(this.state.currentUser.username);
     if (index > -1) { 
       array.splice(index, 1); 
     } else {
