@@ -1,5 +1,4 @@
 import { ajax } from "discourse/lib/ajax";
-import { popupAjaxError } from "discourse/lib/ajax-error";
 import { getOwner } from "discourse-common/lib/get-owner";
 
 export default Ember.Object.create({
@@ -43,14 +42,14 @@ export default Ember.Object.create({
     return ajax(`/retorts/${id}.json`, {
       type: "POST",
       data: { retort },
-    }).catch(popupAjaxError);
+    });
   },
 
   removeRetort({ id }, retort) {
     return ajax(`/retorts/${id}.json`, {
       type: "DELETE",
       data: { retort },
-    }).catch(popupAjaxError);
+    });
   },
 
   disabledCategories() {

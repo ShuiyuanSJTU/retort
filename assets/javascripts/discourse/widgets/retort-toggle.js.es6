@@ -1,5 +1,6 @@
 import { h } from "virtual-dom";
 import { createWidget } from "discourse/widgets/widget";
+import { popupAjaxError } from "discourse/lib/ajax-error";
 import Retort from "../lib/retort";
 import hbs from "discourse/widgets/hbs-compiler";
 
@@ -19,7 +20,7 @@ createWidget("retort-remove-emoji", {
       I18n.t("retort.confirm_remove", { emoji }),
       (confirmed) => {
         if (confirmed) {
-          Retort.removeRetort(post, emoji);
+          Retort.removeRetort(post, emoji).catch(popupAjaxError);
         }
       }
     );
@@ -31,27 +32,26 @@ export default createWidget("retort-toggle", {
 
   buildKey: (attrs) => `retort-toggle-${attrs.post.id}-${attrs.emoji}-${attrs.usernames.length}`,
 
-  defaultState({ emoji, post, usernames, emojiUrl, currentUser}) {
-    return { emoji, post, usernames, emojiUrl, currentUser};
+  defaultState({ emoji, post, usernames, emojiUrl}) {
+    return { emoji, post, usernames, emojiUrl};
   },
 
   buildClasses(attrs) {
-    const { usernames, currentUser } = attrs;
-    if (usernames.includes(currentUser.username)) return ["my-retort"];
+    if (this.state.usernames.includes(this.currentUser.username)) return ["my-retort"];
     else return ["not-my-retort"];
   },
 
   click() {
     const { post, emoji } = this.state;
-    Retort.updateRetort(post, emoji).then(this.updateWidget.bind(this));
+    Retort.updateRetort(post, emoji).then(this.updateWidget.bind(this)).catch(popupAjaxError);
   },
 
   updateWidget() {
-    const index = this.state.usernames.indexOf(this.state.currentUser.username);
+    const index = this.state.usernames.indexOf(this.currentUser.username);
     if (index > -1) { 
-      array.splice(index, 1); 
+      this.state.usernames.splice(index, 1); 
     } else {
-      this.state.usernames.push(this.state.urrentUser.username);
+      this.state.usernames.push(this.currentUser.username);
     }
     this.scheduleRerender()
   },
