@@ -33,7 +33,7 @@ export default createWidget("retort-toggle", {
   buildKey: (attrs) => `retort-toggle-${attrs.post.id}-${attrs.emoji}-${attrs.usernames.length}`,
 
   defaultState({ emoji, post, usernames, emojiUrl }) {
-    const is_my_retort = usernames.includes(this.currentUser.username);
+    const is_my_retort = (this.currentUser == null) ? false : usernames.includes(this.currentUser.username);
     return { emoji, post, usernames, emojiUrl, is_my_retort};
   },
 
@@ -49,7 +49,10 @@ export default createWidget("retort-toggle", {
   },
 
   updateWidget() {
-    if (this.state.is_my_retort) { 
+    if (this.currentUser == null) {
+      return
+    }
+    if (this.state.is_my_retort) {
       const index = this.state.usernames.indexOf(this.currentUser.username);
       this.state.usernames.splice(index, 1);
       this.state.is_my_retort = false;
