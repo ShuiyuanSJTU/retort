@@ -35,7 +35,7 @@ after_initialize do
   register_editable_user_custom_field :hide_ignored_retorts
   register_editable_user_custom_field :disable_retorts
 
-  register_about_stat_group("retort", show_in_ui: true) do 
+  register_stat("retort", show_in_ui: true) do
     {
       :last_day => Retort.where("created_at > ?", 1.days.ago).count,
       "7_days" => Retort.where("created_at > ?", 7.days.ago).count,
