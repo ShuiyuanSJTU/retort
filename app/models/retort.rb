@@ -6,7 +6,6 @@ class Retort < ActiveRecord::Base
   belongs_to :post
   belongs_to :user
   validates :emoji, presence: true
-  validates_associated :post, :user, presence: true
 
   after_save :clear_cache
   after_destroy :clear_cache
