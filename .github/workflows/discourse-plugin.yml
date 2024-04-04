@@ -1,0 +1,11 @@
+name: Discourse Plugin
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ci:
+    uses: ShuiyuanSJTU/.github/.github/workflows/discourse-plugin.yml@v1
+    with: 
+      linting: false
