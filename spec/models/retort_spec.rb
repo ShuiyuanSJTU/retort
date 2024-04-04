@@ -24,7 +24,7 @@ describe Retort do
     it 'has timestamps' do
       expect(retort.created_at).not_to be_nil
       expect(retort.updated_at).not_to be_nil
-      expect(retort.updated_at).to eq retort.created_at
+      expect(retort.updated_at).to eq_time retort.created_at
     end
     it 'not deleted' do
       expect(retort.deleted_at).to be_nil
@@ -81,8 +81,8 @@ describe Retort do
       }.to \
         change{retort.deleted_at}.from(be_present).to(nil) \
         .and change{retort.deleted_by}.from(user.id).to(nil)
-      expect(retort.created_at).to eq original_created_at
-      expect(retort.updated_at).not_to eq original_created_at
+      expect(retort.created_at).to eq_time original_created_at
+      expect(retort.updated_at).not_to eq_time original_created_at
     end
   end
 

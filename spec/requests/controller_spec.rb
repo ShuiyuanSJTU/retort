@@ -12,7 +12,7 @@ describe DiscourseRetort::RetortsController do
     let(:first_post) { Fabricate :post, topic: topic }
     let(:another_post) { Fabricate :post, topic: another_topic }
 
-    context "test create retort" do
+    context "when create retort" do
       before(:example) do
         SiteSetting.retort_disabled_emojis = "+1|laughing"
         SiteSetting.retort_disabled_categories = disabled_category.id.to_s
@@ -73,7 +73,7 @@ describe DiscourseRetort::RetortsController do
       end
     end
 
-    context "test withdraw retort" do
+    context "when withdraw retort" do
       let(:time) { Time.new(2024, 12, 25, 01, 04, 44) }
       let(:emoji) { "heart" }
       
@@ -110,7 +110,7 @@ describe DiscourseRetort::RetortsController do
       end
     end
 
-    context "test recover retort" do
+    context "when recover retort" do
       let(:time) { Time.new(2024, 12, 25, 01, 04, 44) }
       let(:emoji) { "heart" }
       
