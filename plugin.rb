@@ -55,12 +55,15 @@ after_initialize do
     mount ::DiscourseRetort::Engine, at: "/retorts"
   end
 
-  require_dependency 'post_serializer'
-  class ::PostSerializer
-    attributes :retorts
-
-    def retorts
-      Retort.serialize_for_post(object)
+  add_to_serializer(:post, :retorts) do
+    Discourse.cache.fetch(Retort.cache_key(object.id), expires_in: 5.minute) do
+      retort_groups = Retort.where(post_id: object.id, deleted_at: nil).includes(:user).order("created_at").group_by { |r| r.emoji }
+      result = []
+      retort_groups.each do |emoji, group|
+        usernames = group.map { |retort| retort.user.username }
+        result.push({ post_id: object.id, usernames: usernames, emoji: emoji })
+      end
+      result
     end
   end
 

@@ -11,7 +11,7 @@ class Retort < ActiveRecord::Base
   after_destroy :clear_cache
 
   def deleted?
-    return !self.deleted_at.nil?
+    !self.deleted_at.nil?
   end
 
   def toggle!
@@ -51,7 +51,7 @@ class Retort < ActiveRecord::Base
   end
 
   def can_toggle?
-    return false if self.deleted_at and !Retort.can_create?(user,self.post,self.emoji)
+    return false if self.deleted_at && !Retort.can_create?(user,self.post,self.emoji)
     # staff can do anything
     return true if self.user.staff? || self.user.trust_level == 4
     # deleted retort can be recovered
@@ -89,7 +89,7 @@ class Retort < ActiveRecord::Base
   end
 
   def retort_trust_multiplier
-    return 1.0 unless user&.trust_level.to_i >= 2
+    return 1.0 if user&.trust_level.to_i < 2
       SiteSetting.send(:"retort_tl#{user.trust_level}_max_per_day_multiplier")
   end
 
@@ -103,17 +103,5 @@ class Retort < ActiveRecord::Base
 
   def self.clear_cache(post_id)
     Discourse.cache.delete(Retort.cache_key(post_id))
-  end
-
-  def self.serialize_for_post(post)
-    Discourse.cache.fetch(Retort.cache_key(post.id), expires_in: 5.minute) do
-      retort_groups = Retort.where(post_id: post.id, deleted_at: nil).includes(:user).order("created_at").group_by { |r| r.emoji }
-      result = []
-      retort_groups.each do |emoji, group|
-        usernames = group.map { |retort| retort.user.username }
-        result.push({ post_id: post.id, usernames: usernames, emoji: emoji })
-      end
-      result
-    end
   end
 end
