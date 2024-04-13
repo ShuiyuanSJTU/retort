@@ -1,9 +1,10 @@
 import { h } from "virtual-dom";
-import { createWidget } from "discourse/widgets/widget";
 import { popupAjaxError } from "discourse/lib/ajax-error";
-import { getOwnerWithFallback  } from "discourse-common/lib/get-owner";
-import Retort from "../lib/retort";
 import hbs from "discourse/widgets/hbs-compiler";
+import { createWidget } from "discourse/widgets/widget";
+import { getOwnerWithFallback  } from "discourse-common/lib/get-owner";
+import I18n from "discourse-i18n";
+import Retort from "../lib/retort";
 
 createWidget("retort-remove-emoji", {
   tagName: "a.remove-retort",
@@ -38,14 +39,14 @@ export default createWidget("retort-toggle", {
   },
 
   buildClasses() {
-    if (this.state.usernames.length <= 0) return ["nobody-retort"];
-    else if (this.state.is_my_retort) return ["my-retort"];
-    else return ["not-my-retort"];
+    if (this.state.usernames.length <= 0) {return ["nobody-retort"];}
+    else if (this.state.is_my_retort) {return ["my-retort"];}
+    else {return ["not-my-retort"];}
   },
 
   click() {
     if (this.currentUser == null) {
-      return
+      return;
     }
     const { post, emoji } = this.state;
     Retort.updateRetort(post, emoji).then(this.updateWidget.bind(this)).catch(popupAjaxError);
@@ -53,7 +54,7 @@ export default createWidget("retort-toggle", {
 
   updateWidget() {
     if (this.currentUser == null) {
-      return
+      return;
     }
     if (this.state.is_my_retort) {
       const index = this.state.usernames.indexOf(this.currentUser.username);
@@ -63,7 +64,7 @@ export default createWidget("retort-toggle", {
       this.state.usernames.push(this.currentUser.username);
       this.state.is_my_retort = true;
     }
-    this.scheduleRerender()
+    this.scheduleRerender();
   },
 
   html(attrs) {
@@ -75,7 +76,7 @@ export default createWidget("retort-toggle", {
     ];
     if ((!Retort.disableRetortButton(this.state.post.id))
       && attrs.currentUser
-      && (attrs.currentUser.trust_level == 4 || attrs.currentUser.staff)) {
+      && (attrs.currentUser.trust_level === 4 || attrs.currentUser.staff)) {
       res.push(this.attach("retort-remove-emoji", attrs));
     }
     return res;

@@ -3,4 +3,4 @@ export default {
     setupComponent(args, component) {
         Retort.setPicker(component);
     }
-}
+};

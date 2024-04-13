@@ -1,7 +1,6 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 import { emojiUrlFor } from "discourse/lib/text";
 import Retort from "../lib/retort";
-import User from "discourse/models/user";
 
 function initializePlugin(api) {
   const { retort_enabled } = api.container.lookup("site-settings:main");
@@ -15,13 +14,13 @@ function initializePlugin(api) {
     pluginId: "retort",
     actions: {
       save() {
-        this.get('saveAttrNames').push('custom_fields')
-        this._super()
+        this.get('saveAttrNames').push('custom_fields');
+        this._super();
       }
     }
-  })
+  });
 
-  if (currentUser?.custom_fields?.disable_retorts) return;
+  if (currentUser?.custom_fields?.disable_retorts) {return;}
 
   api.decorateWidget("post-contents:after-cooked", (helper) => {
     let postId = helper.getModel().id;
@@ -45,7 +44,7 @@ function initializePlugin(api) {
       .filter(({ emojiUrl }) => emojiUrl)
       .sort((a, b) => a.emoji.localeCompare(b.emoji));
     const retort_widgets = retorts.map(({ emoji, emojiUrl, usernames }) => {
-      var displayUsernames = usernames;
+      let displayUsernames = usernames;
       // check if hide_ignored_retorts is enabled
       if (currentUser?.custom_fields?.hide_ignored_retorts) {
         const ignoredUsers = new Set(currentUser.ignored_users);
@@ -60,7 +59,7 @@ function initializePlugin(api) {
           post,
           usernames: displayUsernames,
           currentUser,
-        })
+        });
       }
       else {
         return null;
@@ -102,7 +101,7 @@ function initializePlugin(api) {
   });
 
   api.attachWidgetAction("post-menu", "clickRetort", function () {
-    const post = this.findAncestorModel()
+    const post = this.findAncestorModel();
     Retort.openPicker(post);
   });
 
