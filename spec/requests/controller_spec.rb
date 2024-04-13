@@ -102,8 +102,7 @@ describe DiscourseRetort::RetortsController do
           sign_in(user)
           post "/retorts/#{first_post.id}.json", params: { retort: emoji }
         end
-        expect(response.status).to eq(422)
-        expect(JSON.parse(response.body)["error"]).to eq I18n.t("retort.error.exceed_withdraw_limit")
+        expect(response.status).to eq(403)
         retort = Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
         expect(retort.deleted_at).to be_nil
         expect(retort.deleted_by).to be_nil
@@ -193,8 +192,7 @@ describe DiscourseRetort::RetortsController do
           sign_in(user)
           post "/retorts/#{first_post.id}.json", params: { retort: emoji }
         end
-        expect(response.status).to eq(422)
-        expect(JSON.parse(response.body)["error"]).to eq I18n.t("retort.error.exceed_withdraw_limit")
+        expect(response.status).to eq(403)
         retort = Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
         expect(retort.deleted_at).to be_nil
         expect(retort.deleted_by).to be_nil

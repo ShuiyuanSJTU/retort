@@ -35,6 +35,9 @@ after_initialize do
   register_editable_user_custom_field :hide_ignored_retorts
   register_editable_user_custom_field :disable_retorts
 
+  require_relative "lib/guardian/retort_guardian.rb"
+  ::Guardian.prepend DiscourseRetort::RetortGuardian
+
   register_stat("retort", show_in_ui: true, expose_via_api: true) do 
     {
       :last_day => Retort.where("created_at > ?", 1.days.ago).count,
@@ -87,6 +90,4 @@ after_initialize do
       end
     end
   end
-
-  DiscourseEvent.trigger(:plugin_retort_initialized)
 end

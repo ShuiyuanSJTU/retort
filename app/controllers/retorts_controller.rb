@@ -18,36 +18,24 @@ class DiscourseRetort::RetortsController < ::ApplicationController
     end
 
     exist_record = Retort.find_by(post_id: post.id, user_id: current_user.id, emoji: emoji)
-    if exist_record
+    if exist_record.present?
       if exist_record.deleted?
         # Record has been deleted, try to create again
-        if exist_record.can_recover?
-          exist_record.recover!
-          DiscourseEvent.trigger(:create_retort,post,current_user,emoji)
-        else
-          respond_with_unprocessable(I18n.t("retort.error.guardian_fail"))
-          return
-        end
+        guardian.ensure_can_recover_retort!(exist_record)
+        exist_record.recover!
+        DiscourseEvent.trigger(:create_retort,post,current_user,emoji)
       else
-        if exist_record.can_withdraw?
-          exist_record.withdraw!
-          DiscourseEvent.trigger(:withdraw_retort,post,current_user,emoji)
-        else
-          respond_with_unprocessable(I18n.t("retort.error.exceed_withdraw_limit"))
-          return
-        end
+        guardian.ensure_can_delete_retort!(exist_record)
+        exist_record.withdraw!
+        DiscourseEvent.trigger(:withdraw_retort,post,current_user,emoji)
       end
     else
-      if !Retort.can_create?(current_user,post,emoji)
-        respond_with_unprocessable(I18n.t("retort.error.guardian_fail"))
-        return
-      else
-        begin
-          exist_record = Retort.create(post_id: post.id, user_id: current_user.id, emoji: emoji)
-          DiscourseEvent.trigger(:create_retort,post,current_user,emoji) unless exist_record.nil?
-        rescue ActiveRecord::RecordNotUnique
-          # Concurrent creation, ignore
-        end
+      guardian.ensure_can_create!(Retort, post)
+      begin
+        exist_record = Retort.create(post_id: post.id, user_id: current_user.id, emoji: emoji)
+        DiscourseEvent.trigger(:create_retort,post,current_user,emoji) unless exist_record.nil?
+      rescue ActiveRecord::RecordNotUnique
+        # Concurrent creation, ignore
       end
     end
 
