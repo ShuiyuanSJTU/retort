@@ -1,9 +1,9 @@
 module DiscourseRetort
   module OverridePostSerializer
     extend ::ActiveSupport::Concern
-    
+
     prepended do
-      attributes :retorts, :my_retorts, :can_retort
+      attributes :retorts, :my_retorts, :can_retort, :can_remove_retort
     end
 
     def retorts
@@ -26,6 +26,10 @@ module DiscourseRetort
 
     def can_retort
       scope.can_create?(Retort, object)
+    end
+
+    def can_remove_retort
+      scope.can_moderate_retort?(object)
     end
   end
 end

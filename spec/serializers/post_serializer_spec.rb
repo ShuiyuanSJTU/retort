@@ -52,4 +52,14 @@ RSpec.describe PostSerializer do
       expect(PostSerializer.new(post, scope: Guardian.new).as_json[:post][:can_retort]).to eq(false)
     end
   end
+
+  describe "#can_remove_retort" do
+    it "should be false for normal user" do
+      expect(PostSerializer.new(post, scope: Guardian.new(user1)).as_json[:post][:can_remove_retort]).to eq(false)
+    end
+
+    it "should be true for staff" do
+      expect(PostSerializer.new(post, scope: Guardian.new(Fabricate(:admin))).as_json[:post][:can_remove_retort]).to eq(true)
+    end
+  end
 end
