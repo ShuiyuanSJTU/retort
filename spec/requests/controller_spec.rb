@@ -156,7 +156,7 @@ describe DiscourseRetort::RetortsController do
       end
     end
 
-    describe "test withdraw after recover" do
+    context "when withdraw after recover" do
       let(:time) { Time.new(2024, 12, 25, 01, 04, 44) }
       let(:emoji) { "heart" }
       
@@ -207,6 +207,54 @@ describe DiscourseRetort::RetortsController do
         expect(retort.deleted_by).to be_nil
         expect(retort.updated_at).to eq_time time + 6.seconds
         expect(retort.created_at).to eq_time time
+      end
+    end
+
+    context "when remove retort" do
+      it "can not remove" do
+        Retort.create(post_id: first_post.id, user_id: user.id, emoji: "heart")
+        sign_in(user)
+        delete "/retorts/#{first_post.id}.json", params: { retort: "heart" }
+        expect(response.status).to eq(403)
+        expect(Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: "heart")).not_to be_nil
+      end
+    end
+  end
+
+  describe "staff user" do
+    let(:staff) { Fabricate(:moderator) }
+    let(:first_post) { Fabricate(:post) }
+    let(:user) { Fabricate(:user) }
+    let(:another_user) { Fabricate(:user) }
+
+    context "when remove retort" do
+      let(:emoji) { "heart" }
+
+      before(:example) do
+        Retort.create(post_id: first_post.id, user_id: user.id, emoji: emoji)
+        Retort.create(post_id: first_post.id, user_id: another_user.id, emoji: emoji)
+      end
+
+      it "can remove" do
+        sign_in(staff)
+        delete "/retorts/#{first_post.id}.json", params: { retort: emoji }
+        expect(response.status).to eq(200)
+        expect(JSON.parse(response.body)["success"]).to eq "ok"
+        expect(Retort.find_by(post_id: first_post.id, emoji: emoji, deleted_at: nil)).to be_nil
+        expect(Retort.where(post_id: first_post.id, emoji: emoji).pluck(:deleted_by)).to all eq(staff.id)
+      end
+
+      it "can not recover after removed by staff" do
+        Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji).withdraw!
+        sign_in(staff)
+        delete "/retorts/#{first_post.id}.json", params: { retort: emoji }
+        expect(response.status).to eq(200)
+        sign_in(another_user)
+        post "/retorts/#{first_post.id}.json", params: { retort: emoji }
+        expect(response.status).to eq(403)
+        sign_in(user)
+        post "/retorts/#{first_post.id}.json", params: { retort: emoji }
+        expect(response.status).to eq(200)
       end
     end
   end

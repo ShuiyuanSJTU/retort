@@ -43,13 +43,13 @@ describe Retort do
       invalid_post_id = post.id + 100000
       expect{
         Retort.create(
-          post_id: invalid_post_id, user_id: user.id, emoji: emoji).save!
+          post_id: invalid_post_id, user_id: user.id, emoji: emoji)
         }.to raise_error ActiveRecord::InvalidForeignKey
     end
     it 'is valid' do
       expect{
         Retort.create(
-          post_id: post.id, user_id: user.id, emoji: emoji).save!
+          post_id: post.id, user_id: user.id, emoji: emoji)
       }.not_to raise_error
     end
   end

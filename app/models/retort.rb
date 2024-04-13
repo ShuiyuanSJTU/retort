@@ -20,7 +20,6 @@ class Retort < ActiveRecord::Base
     else
       self.withdraw!
     end
-    self.save!
   end
 
   def withdraw!
@@ -36,7 +35,7 @@ class Retort < ActiveRecord::Base
   end
 
   def self.remove_retort(post_id, emoji, actor_id)
-    exist_record = Retort.where(post_id: post_id, emoji: emoji)
+    exist_record = Retort.where(post_id: post_id, emoji: emoji, deleted_at: nil)
     if exist_record.present?
       exist_record.update_all(deleted_at: Time.now, deleted_by: actor_id)
       Retort.clear_cache(post_id)

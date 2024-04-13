@@ -34,8 +34,8 @@ module DiscourseRetort::RetortGuardian
     true
   end
 
-  def can_moderate_retort?(retort)
-    return false if retort.nil?
+  def can_moderate_retort?(post = nil)
+    return false if post.nil?
     return true if is_staff?
     false
   end

@@ -47,13 +47,10 @@ class DiscourseRetort::RetortsController < ::ApplicationController
   def remove
     params.require(:retort)
     emoji = params[:retort]
-    if !(current_user.staff? || current_user.trust_level == 4)
-      respond_with_unprocessable(I18n.t("retort.error.guardian_fail"))
-      return
-    end
+    guardian.ensure_can_moderate_retort!(post)
 
     result = Retort.remove_retort(post.id, emoji, current_user.id)
-    if result
+    if result.present?
       UserHistory.create!(
         acting_user_id: current_user.id,
         action: UserHistory.actions[:post_edit],
@@ -73,7 +70,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
 
   def verify_post_and_user
     if !post.present? || !current_user.present?
-      raise Discourse::InvalidAccess.new
+      raise Discourse::InvalidAccess.new(I18n.t("retort.error.guardian_fail"))
     end
   end
 
