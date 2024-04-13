@@ -13,7 +13,7 @@ plugins:
   retort_withdraw_tolerance:
     type: number
     default: 5
-    client: false
+    client: true
   retort_allow_multiple_reactions:
     default: true
   retort_disabled_categories:

@@ -30,6 +30,10 @@
   display: inline-flex;
   align-items: center;
 
+  &[disabled=true] {
+    cursor: not-allowed;
+  }
+
   img {
     margin-right: 4px;
   }

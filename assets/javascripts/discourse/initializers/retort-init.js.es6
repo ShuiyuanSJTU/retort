@@ -88,7 +88,8 @@ function initializePlugin(api) {
   });
 
   api.addPostMenuButton("retort", (attrs) => {
-    if (Retort.disableRetortButton(attrs.id)) {
+    const post = Retort.postFor(attrs.id);
+    if (!post.can_retort) {
       return;
     }
     return {

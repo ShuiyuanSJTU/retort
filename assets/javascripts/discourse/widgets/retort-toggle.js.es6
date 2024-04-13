@@ -34,8 +34,10 @@ export default createWidget("retort-toggle", {
   buildKey: (attrs) => `retort-toggle-${attrs.post.id}-${attrs.emoji}-${attrs.usernames.length}`,
 
   defaultState({ emoji, post, usernames, emojiUrl }) {
-    const is_my_retort = (this.currentUser == null) ? false : usernames.includes(this.currentUser.username);
-    return { emoji, post, usernames, emojiUrl, is_my_retort};
+    const my_retort = post.my_retorts?.find((retort) => retort.emoji === emoji);
+    const is_my_retort = my_retort ? true : false;
+    const my_retort_update_time = is_my_retort ? new Date(my_retort?.updated_at) : undefined;
+    return { emoji, post, usernames, emojiUrl, is_my_retort, my_retort_update_time};
   },
 
   buildClasses() {
@@ -44,12 +46,30 @@ export default createWidget("retort-toggle", {
     else {return ["not-my-retort"];}
   },
 
+  // eslint-disable-next-line no-unused-vars
+  buildAttributes(attrs) {
+    if (this.disabled()) { return { disabled: true }; }
+    return {};
+  },
+
   click() {
     if (this.currentUser == null) {
       return;
     }
     const { post, emoji } = this.state;
     Retort.updateRetort(post, emoji).then(this.updateWidget.bind(this)).catch(popupAjaxError);
+  },
+
+  disabled() {
+    if (!this.state.post.can_retort) {return true;}
+    if (this.state.is_my_retort) {
+      const diff = new Date() - this.state.my_retort_update_time;
+      if (diff > this.siteSettings.retort_withdraw_tolerance * 1000) {
+        // cannot withdraw if exceeding torlerance time
+        return true;
+      }
+    }
+    return false;
   },
 
   updateWidget() {
@@ -63,20 +83,20 @@ export default createWidget("retort-toggle", {
     } else {
       this.state.usernames.push(this.currentUser.username);
       this.state.is_my_retort = true;
+      this.state.my_retort_update_time = new Date();
     }
     this.scheduleRerender();
   },
 
   html(attrs) {
     const { emoji, usernames, emojiUrl } = this.state;
+    if (usernames.length <= 0) {return [];}
     const res = [
       h("img.emoji", { src: emojiUrl, alt: `:${emoji}:` }),
       h("span.post-retort__count", usernames.length.toString()),
       h("span.post-retort__tooltip", this.sentence(this.state)),
     ];
-    if ((!Retort.disableRetortButton(this.state.post.id))
-      && attrs.currentUser
-      && (attrs.currentUser.trust_level === 4 || attrs.currentUser.staff)) {
+    if (attrs.post.can_remove_retort) {
       res.push(this.attach("retort-remove-emoji", attrs));
     }
     return res;
