@@ -38,6 +38,9 @@ after_initialize do
   require_relative "lib/guardian/retort_guardian.rb"
   ::Guardian.prepend DiscourseRetort::RetortGuardian
 
+  require_relative "lib/override_post_serializer.rb"
+  ::PostSerializer.prepend DiscourseRetort::OverridePostSerializer
+
   register_stat("retort", show_in_ui: true, expose_via_api: true) do 
     {
       :last_day => Retort.where("created_at > ?", 1.days.ago).count,
@@ -56,18 +59,6 @@ after_initialize do
 
   Discourse::Application.routes.append do
     mount ::DiscourseRetort::Engine, at: "/retorts"
-  end
-
-  add_to_serializer(:post, :retorts) do
-    Discourse.cache.fetch(Retort.cache_key(object.id), expires_in: 5.minute) do
-      retort_groups = Retort.where(post_id: object.id, deleted_at: nil).includes(:user).order("created_at").group_by { |r| r.emoji }
-      result = []
-      retort_groups.each do |emoji, group|
-        usernames = group.map { |retort| retort.user.username }
-        result.push({ post_id: object.id, usernames: usernames, emoji: emoji })
-      end
-      result
-    end
   end
 
   class ::User
