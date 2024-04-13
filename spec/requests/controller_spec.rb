@@ -18,6 +18,18 @@ describe DiscourseRetort::RetortsController do
         SiteSetting.retort_disabled_categories = disabled_category.id.to_s
       end
 
+      it "can not create without sign in" do
+        post "/retorts/#{first_post.id}.json", params: { retort: "heart" }
+        expect(response.status).to eq(403)
+        expect(Retort.find_by(post_id: first_post.id, emoji: "heart")).to be_nil
+      end
+
+      it "can not create on invalid post" do
+        sign_in(user)
+        post "/retorts/100000.json", params: { retort: "heart" }
+        expect(response.status).to eq(403)
+      end
+
       it "can create on normal post" do
         time = Time.new(2024, 12, 25, 01, 04, 44)
         travel_to time do
@@ -35,8 +47,7 @@ describe DiscourseRetort::RetortsController do
       it "can not create on disabled category post" do
         sign_in(user)
         post "/retorts/#{another_post.id}.json", params: { retort: "heart" }
-        expect(response.status).to eq(422)
-        expect(JSON.parse(response.body)["error"]).to eq I18n.t("retort.error.guardian_fail")
+        expect(response.status).to eq(403)
       end
 
       it "can not create on disabled emoji" do
@@ -60,16 +71,14 @@ describe DiscourseRetort::RetortsController do
         first_post.topic.update(archived: true)
         sign_in(user)
         post "/retorts/#{first_post.id}.json", params: { retort: "heart" }
-        expect(response.status).to eq(422)
-        expect(JSON.parse(response.body)["error"]).to eq I18n.t("retort.error.archived_topic")
+        expect(response.status).to eq(403)
       end
 
       it "can not create by silenced user" do
         user.update(silenced_till: 1.day.from_now)
         sign_in(user)
         post "/retorts/#{first_post.id}.json", params: { retort: "heart" }
-        expect(response.status).to eq(422)
-        expect(JSON.parse(response.body)["error"]).to eq I18n.t("retort.error.guardian_fail")
+        expect(response.status).to eq(403)
       end
     end
 
