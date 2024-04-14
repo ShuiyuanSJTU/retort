@@ -14,13 +14,13 @@ export default Object.create({
     this.set("topic", topic);
     messageBus.subscribe(
       `/retort/topics/${this.topic.id}`,
-      ({ id, retorts }) => {
+      ({ id, retorts, my_retorts, can_retort, can_remove_retort }) => {
         const post = this.postFor(id);
         if (!post) {
           return;
         }
 
-        post.setProperties({ retorts });
+        post.setProperties({ retorts, my_retorts, can_retort, can_remove_retort });
         this.get(`widgets.${id}`).scheduleRerender();
       }
     );
@@ -33,11 +33,18 @@ export default Object.create({
     return (this.get("topic.postStream.posts") || []).find((p) => p.id === id);
   },
 
-  storeWidget(helper) {
+  storeWidget(id, widget) {
     if (!this.get("widgets")) {
       this.set("widgets", {});
     }
-    this.set(`widgets.${helper.getModel().id}`, helper.widget);
+    this.set(`widgets.${id}`, widget);
+  },
+
+  removeStoredWidget(id) {
+    if (!this.get(`widgets.${id}`)) {
+      return;
+    }
+    delete this.get("widgets")[id];
   },
 
   updateRetort({ id }, retort) {

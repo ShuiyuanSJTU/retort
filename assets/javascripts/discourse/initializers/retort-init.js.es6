@@ -27,48 +27,7 @@ function initializePlugin(api) {
     let postId = helper.getModel().id;
     let post = Retort.postFor(postId);
 
-    if (Retort.disableShowForPost(postId)) {
-      return;
-    }
-
-    Retort.storeWidget(helper);
-
-    if (!post.retorts) {
-      return;
-    }
-
-    const retorts = post.retorts
-      .map((item) => {
-        item.emojiUrl = emojiUrlFor(item.emoji);
-        return item;
-      })
-      .filter(({ emojiUrl }) => emojiUrl)
-      .sort((a, b) => a.emoji.localeCompare(b.emoji));
-    const retort_widgets = retorts.map(({ emoji, emojiUrl, usernames }) => {
-      let displayUsernames = usernames;
-      // check if hide_ignored_retorts is enabled
-      if (currentUser?.custom_fields?.hide_ignored_retorts) {
-        const ignoredUsers = new Set(currentUser.ignored_users);
-        displayUsernames = usernames.filter((username) => {
-          return !ignoredUsers.has(username);
-        });
-      }
-      if (displayUsernames.length > 0) {
-        return helper.attach("retort-toggle", {
-          emoji,
-          emojiUrl,
-          post,
-          usernames: displayUsernames,
-          currentUser,
-        });
-      }
-      else {
-        return null;
-      }
-    }
-    );
-
-    return helper.h("div.post-retort-container", retort_widgets);
+    return helper.attach("post-retort-container", { post, currentUser });
   });
 
 
