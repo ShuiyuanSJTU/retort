@@ -51,22 +51,6 @@ export default createWidget("retort-toggle", {
     return false;
   },
 
-  updateWidget() {
-    if (this.currentUser == null) {
-      return;
-    }
-    if (this.state.isMyRetort) {
-      const index = this.state.displayUsernames.indexOf(this.currentUser.username);
-      this.state.displayUsernames.splice(index, 1);
-      this.state.isMyRetort = false;
-    } else {
-      this.state.displayUsernames.push(this.currentUser.username);
-      this.state.isMyRetort = true;
-      this.state.myRetortUpdateTime = new Date();
-    }
-    this.scheduleRerender();
-  },
-
   html(attrs) {
     const { emoji, displayUsernames, emojiUrl } = this.state;
     if (displayUsernames.length <= 0) {return [];}
