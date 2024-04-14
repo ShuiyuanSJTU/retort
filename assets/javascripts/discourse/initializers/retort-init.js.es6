@@ -1,5 +1,6 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 import { emojiUrlFor } from "discourse/lib/text";
+import { getOwnerWithFallback } from "discourse-common/lib/get-owner";
 import Retort from "../lib/retort";
 
 function initializePlugin(api) {
@@ -81,7 +82,7 @@ function initializePlugin(api) {
     pluginId: "retort",
 
     setupController(controller, model) {
-      const messageBus = api.container.lookup("message-bus:main");
+      const messageBus = getOwnerWithFallback(this).lookup("message-bus:main");
       Retort.initialize(messageBus, model);
       this._super(controller, model);
     },

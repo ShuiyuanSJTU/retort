@@ -35,14 +35,15 @@ export default createWidget("retort-toggle", {
 
   defaultState({ emoji, post, usernames, emojiUrl }) {
     const my_retort = post.my_retorts?.find((retort) => retort.emoji === emoji);
-    const is_my_retort = my_retort ? true : false;
-    const my_retort_update_time = is_my_retort ? new Date(my_retort?.updated_at) : undefined;
-    return { emoji, post, usernames, emojiUrl, is_my_retort, my_retort_update_time};
+    const isMyRetort = my_retort ? true : false;
+    const myRetortUpdateTime = isMyRetort ? new Date(my_retort?.updated_at) : undefined;
+    const displayUsernames = Array.from(usernames);
+    return { emoji, post, displayUsernames, emojiUrl, isMyRetort, myRetortUpdateTime};
   },
 
   buildClasses() {
-    if (this.state.usernames.length <= 0) {return ["nobody-retort"];}
-    else if (this.state.is_my_retort) {return ["my-retort"];}
+    if (this.state.displayUsernames.length <= 0) {return ["nobody-retort"];}
+    else if (this.state.isMyRetort) {return ["my-retort"];}
     else {return ["not-my-retort"];}
   },
 
@@ -62,8 +63,8 @@ export default createWidget("retort-toggle", {
 
   disabled() {
     if (!this.state.post.can_retort) {return true;}
-    if (this.state.is_my_retort) {
-      const diff = new Date() - this.state.my_retort_update_time;
+    if (this.state.isMyRetort) {
+      const diff = new Date() - this.state.myRetortUpdateTime;
       if (diff > this.siteSettings.retort_withdraw_tolerance * 1000) {
         // cannot withdraw if exceeding torlerance time
         return true;
@@ -76,24 +77,24 @@ export default createWidget("retort-toggle", {
     if (this.currentUser == null) {
       return;
     }
-    if (this.state.is_my_retort) {
-      const index = this.state.usernames.indexOf(this.currentUser.username);
-      this.state.usernames.splice(index, 1);
-      this.state.is_my_retort = false;
+    if (this.state.isMyRetort) {
+      const index = this.state.displayUsernames.indexOf(this.currentUser.username);
+      this.state.displayUsernames.splice(index, 1);
+      this.state.isMyRetort = false;
     } else {
-      this.state.usernames.push(this.currentUser.username);
-      this.state.is_my_retort = true;
-      this.state.my_retort_update_time = new Date();
+      this.state.displayUsernames.push(this.currentUser.username);
+      this.state.isMyRetort = true;
+      this.state.myRetortUpdateTime = new Date();
     }
     this.scheduleRerender();
   },
 
   html(attrs) {
-    const { emoji, usernames, emojiUrl } = this.state;
-    if (usernames.length <= 0) {return [];}
+    const { emoji, displayUsernames, emojiUrl } = this.state;
+    if (displayUsernames.length <= 0) {return [];}
     const res = [
       h("img.emoji", { src: emojiUrl, alt: `:${emoji}:` }),
-      h("span.post-retort__count", usernames.length.toString()),
+      h("span.post-retort__count", displayUsernames.length.toString()),
       h("span.post-retort__tooltip", this.sentence(this.state)),
     ];
     if (attrs.post.can_remove_retort) {
@@ -102,9 +103,9 @@ export default createWidget("retort-toggle", {
     return res;
   },
 
-  sentence({ usernames, emoji }) {
+  sentence({ displayUsernames, emoji }) {
     let key;
-    switch (usernames.length) {
+    switch (displayUsernames.length) {
       case 1:
         key = "retort.reactions.one_person";
         break;
@@ -118,9 +119,9 @@ export default createWidget("retort-toggle", {
 
     return I18n.t(key, {
       emoji,
-      first: usernames[0],
-      second: usernames[1],
-      count: usernames.length - 2,
+      first: displayUsernames[0],
+      second: displayUsernames[1],
+      count: displayUsernames.length - 2,
     });
   },
 });
