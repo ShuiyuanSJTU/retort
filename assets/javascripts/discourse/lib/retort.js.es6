@@ -129,13 +129,13 @@ export default Object.create({
         post_id: postId,
         emoji,
         usernames: [currentUser.username],
-      })
+      });
       post.my_retorts.push({
         emoji,
         updated_at: new Date().toISOString(),
       });
     } else {
-      const isMyRetort = post.my_retorts?.find((retort) => retort.emoji === emoji) ? true : false; 
+      const isMyRetort = post.my_retorts?.find((retort) => retort.emoji === emoji) ? true : false;
       if (isMyRetort) {
         //remove username from targetRetort
         const index = targetRetort.usernames.indexOf(currentUser.username);

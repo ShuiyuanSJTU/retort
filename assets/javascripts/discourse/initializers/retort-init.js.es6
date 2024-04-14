@@ -1,5 +1,4 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
-import { emojiUrlFor } from "discourse/lib/text";
 import { getOwnerWithFallback } from "discourse-common/lib/get-owner";
 import Retort from "../lib/retort";
 

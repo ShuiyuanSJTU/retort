@@ -1,13 +1,13 @@
-import { click, visit, pauseTest } from "@ember/test-helpers";
+import { click, visit } from "@ember/test-helpers";
 import { test } from "qunit";
 import {
   acceptance,
   count,
   exists,
+  publishToMessageBus,
   query,
   queryAll,
   visible,
-  publishToMessageBus,
 } from "discourse/tests/helpers/qunit-helpers";
 import retortFixtures from "../fixtures/topic-with-retort";
 

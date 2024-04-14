@@ -1,10 +1,6 @@
-import { popupAjaxError } from "discourse/lib/ajax-error";
-import hbs from "discourse/widgets/hbs-compiler";
-import { createWidget } from "discourse/widgets/widget";
-import { getOwnerWithFallback } from "discourse-common/lib/get-owner";
-import I18n from "discourse-i18n";
-import Retort from "../lib/retort";
 import { emojiUrlFor } from "discourse/lib/text";
+import { createWidget } from "discourse/widgets/widget";
+import Retort from "../lib/retort";
 
 createWidget("post-retort-container", {
   tagName: "div.post-retort-container",
