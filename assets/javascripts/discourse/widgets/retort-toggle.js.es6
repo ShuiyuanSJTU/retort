@@ -34,7 +34,9 @@ export default createWidget("retort-toggle", {
       return;
     }
     const { post, emoji } = this.state;
-    Retort.updateRetort(post, emoji).then(this.updateWidget.bind(this)).catch(popupAjaxError);
+    Retort.updateRetort(post, emoji)
+      .then(Retort.localUpdateWidget(post.id, emoji))
+      .catch(popupAjaxError);
   },
 
   disabled() {

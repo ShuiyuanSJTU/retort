@@ -107,10 +107,54 @@ export default Object.create({
 
   setPicker(picker) {
     this.set("picker", picker);
-    this.set("picker.emojiSelected", (retort) =>
-      this.updateRetort(picker.post, retort).then(() =>
-        picker.set("isActive", false)
+    this.set("picker.emojiSelected", (emoji) =>
+      this.updateRetort(picker.post, emoji).then(() => {
+          picker.set("isActive", false);
+          this.localUpdateWidget(picker.post.id, emoji);
+        }
       ).catch(popupAjaxError)
     );
   },
+
+  localUpdateWidget(postId, emoji) {
+    const currentUser = getOwnerWithFallback(this).lookup("service:current-user");
+    const post = this.postFor(postId);
+    const widget = this.get(`widgets.${postId}`);
+    if (!post || !widget) {
+      return;
+    }
+    const targetRetort = post.retorts.find((retort) => retort.emoji === emoji);
+    if (!targetRetort) {
+      post.retorts.push({
+        post_id: postId,
+        emoji,
+        usernames: [currentUser.username],
+      })
+      post.my_retorts.push({
+        emoji,
+        updated_at: new Date().toISOString(),
+      });
+    } else {
+      const isMyRetort = post.my_retorts?.find((retort) => retort.emoji === emoji) ? true : false; 
+      if (isMyRetort) {
+        //remove username from targetRetort
+        const index = targetRetort.usernames.indexOf(currentUser.username);
+        targetRetort.usernames.splice(index, 1);
+        if (targetRetort.usernames.length <= 0) {
+          const retortIndex = post.retorts.findIndex((retort) => retort.emoji === emoji);
+          post.retorts.splice(retortIndex, 1);
+        }
+        //remove retort from my_retorts
+        const myRetortIndex = post.my_retorts.findIndex((retort) => retort.emoji === emoji);
+        post.my_retorts.splice(myRetortIndex, 1);
+      } else {
+        targetRetort.usernames.push(currentUser.username);
+        post.my_retorts.push({
+          emoji,
+          updated_at: new Date().toISOString(),
+        });
+      }
+    }
+    widget.scheduleRerender();
+  }
 });
