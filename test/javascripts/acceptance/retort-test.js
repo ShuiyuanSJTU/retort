@@ -1,4 +1,4 @@
-import { click, visit } from "@ember/test-helpers";
+import { click, visit, pauseTest } from "@ember/test-helpers";
 import { test } from "qunit";
 import {
   acceptance,
@@ -80,7 +80,6 @@ acceptance("Poll results", function (needs) {
       !visible("#post_2 .actions button.retort"),
       "The retort button is not visible"
     );
-    // await pauseTest();
     assert.strictEqual(
       count("#post_2 .post-retort-container button.post-retort[disabled=true] img"),
       3,
@@ -142,10 +141,14 @@ acceptance("Poll results", function (needs) {
       visible(".emoji-picker"),
       "The emoji picker is visible"
     );
-    await click("#post_1");
+    await click(".emoji-picker .section-group img[title='melting_face']");
     assert.ok(
       !visible(".emoji-picker"),
       "The emoji picker is not visible"
+    );
+    assert.ok(
+      visible("#post_1 button.post-retort:has(img[alt=':melting_face:'])"),
+      "New retort is visible"
     );
   });
 
