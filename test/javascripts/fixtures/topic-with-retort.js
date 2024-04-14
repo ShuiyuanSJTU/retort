@@ -22,7 +22,7 @@ export default {
           reads: 475,
           score: 1702.25,
           yours: false,
-          topic_id: 54077,
+          topic_id: 114514,
           topic_slug: "short-topic-with-two-posts",
           display_username: "Uwe Keim",
           primary_group_name: null,
@@ -56,7 +56,7 @@ export default {
           user_suspended: true,
           retorts: [
             {
-              post_id: 156,
+              post_id: 398,
               usernames: [
                 "User123",
                 "张三123",
@@ -69,14 +69,14 @@ export default {
               emoji: "pouting_cat"
             },
             {
-              post_id: 156,
+              post_id: 398,
               usernames: [
                 "pangbo"
               ],
               emoji: "smile"
             },
             {
-              post_id: 156,
+              post_id: 398,
               usernames: [
                 "张三123",
                 "ABC_456",
@@ -89,7 +89,7 @@ export default {
               emoji: "+1"
             },
             {
-              post_id: 156,
+              post_id: 398,
               usernames: [
                 "User123",
                 "张三123",
@@ -139,7 +139,7 @@ export default {
           reads: 460,
           score: 308.35,
           yours: false,
-          topic_id: 54077,
+          topic_id: 114514,
           topic_slug: "short-topic-with-two-posts",
           display_username: "Tim Stone",
           primary_group_name: null,
@@ -172,7 +172,7 @@ export default {
           wiki: false,
           retorts: [
             {
-              post_id: 156,
+              post_id: 421,
               usernames: [
                 "User123",
                 "张三123",
@@ -185,7 +185,7 @@ export default {
               emoji: "pouting_cat"
             },
             {
-              post_id: 156,
+              post_id: 421,
               usernames: [
                 "张三123",
                 "ABC_456",
@@ -198,7 +198,7 @@ export default {
               emoji: "+1"
             },
             {
-              post_id: 156,
+              post_id: 421,
               usernames: [
                 "User123",
                 "张三123",
@@ -244,7 +244,7 @@ export default {
           reads: 460,
           score: 308.35,
           yours: false,
-          topic_id: 54077,
+          topic_id: 114514,
           topic_slug: "short-topic-with-two-posts",
           display_username: "Tim Stone",
           primary_group_name: null,
@@ -334,7 +334,7 @@ export default {
       stream: [398, 419],
       gaps: { before: {}, after: { 398: [419] } },
     },
-    id: 54077,
+    id: 114514,
     title: "Short topic with two posts",
     fancy_title: "Short topic with two posts",
     posts_count: 2,
@@ -354,7 +354,7 @@ export default {
     word_count: 300,
     deleted_at: null,
     draft: null,
-    draft_key: "topic_54077",
+    draft_key: "topic_114514",
     draft_sequence: 3,
     posted: true,
     unpinned: null,
@@ -466,5 +466,131 @@ export default {
       },
     ],
     tags: null,
+  },
+  "/retort/topics/114514.json": {
+    id: 398,
+    name: "Uwe Keim",
+    username: "uwe_keim",
+    avatar_template: "/images/avatar.png",
+    uploaded_avatar_id: 5697,
+    created_at: "2013-02-05T21:29:00.280Z",
+    cooked: "<p>This is a short topic.</p>",
+    post_number: 1,
+    post_type: 1,
+    updated_at: "2013-02-05T21:29:00.280Z",
+    like_count: 0,
+    reply_count: 1,
+    reply_to_post_number: null,
+    quote_count: 0,
+    incoming_link_count: 314,
+    reads: 475,
+    score: 1702.25,
+    yours: false,
+    topic_id: 114514,
+    topic_slug: "short-topic-with-two-posts",
+    display_username: "Uwe Keim",
+    primary_group_name: null,
+    version: 1,
+    can_edit: true,
+    can_delete: false,
+    can_recover: true,
+    link_counts: [],
+    read: true,
+    user_title: null,
+    actions_summary: [
+      {
+        id: 2,
+        count: 0,
+        hidden: false,
+        can_act: true,
+      },
+    ],
+    moderator: false,
+    admin: false,
+    staff: false,
+    user_id: 255,
+    hidden: false,
+    hidden_reason_id: null,
+    trust_level: 2,
+    deleted_at: null,
+    user_deleted: false,
+    edit_reason: null,
+    can_view_edit_history: true,
+    wiki: false,
+    user_suspended: true,
+    retorts: [
+      {
+        post_id: 398,
+        usernames: [
+          "User123",
+          "张三123",
+          "ABC_456",
+          "Test_User",
+          "李四_ABC",
+          "DEF456",
+          "pangbo"
+        ],
+        emoji: "pouting_cat"
+      },
+      {
+        post_id: 398,
+        usernames: [
+          "pangbo",
+          "DEF456"
+        ],
+        emoji: "smile"
+      },
+      {
+        post_id: 398,
+        usernames: [
+          "张三123",
+          "ABC_456",
+          "Test_User",
+          "李四_ABC",
+          "DEF456",
+          "somebody",
+          "pangbo"
+        ],
+        emoji: "+1"
+      },
+      {
+        post_id: 398,
+        usernames: [
+          "User123",
+          "张三123",
+          "ABC_456",
+          "NewUser1",
+          "新用户2",
+          "ID_789",
+          "User_XYZ",
+          "新用户3"
+        ],
+        emoji: "ocean"
+      },
+      {
+        post_id: 398,
+        usernames: [
+          "User123",
+          "张三123",
+        ],
+        emoji: "innocent"
+      }
+    ],
+    my_retorts: [
+      {
+        emoji: "pouting_cat",
+        updated_at: "2021-06-08T21:59:16.444Z",
+      },
+      {
+        emoji: "smile",
+        updated_at: "2021-06-08T21:59:16.444Z",
+      },
+      {
+        emoji: "ocean",
+        updated_at: "2021-06-08T21:59:16.444Z",
+      }
+    ],
+    can_retort: true,
+    can_remove_retort: false,
   },
 };

@@ -7,6 +7,7 @@ import {
   query,
   queryAll,
   visible,
+  publishToMessageBus,
 } from "discourse/tests/helpers/qunit-helpers";
 import retortFixtures from "../fixtures/topic-with-retort";
 
@@ -163,6 +164,29 @@ acceptance("Poll results", function (needs) {
     assert.ok(
       !visible("#dialog-holder"),
       "The dialog is not visible"
+    );
+  });
+
+  test("message bus", async function (assert) {
+    await visit("/t/retort-topic/114514");
+    await publishToMessageBus("/retort/topics/114514",
+      retortFixtures["/retort/topics/114514.json"]);
+    assert.ok(
+      visible("#post_1 .post-retort-container button.post-retort:has(img[alt=':innocent:'])"),
+    );
+    assert.strictEqual(
+      query("#post_1 .post-retort-container button.post-retort:has(img[alt=':+1:']) .post-retort__count").innerText,
+      "7",
+    );
+    assert.strictEqual(
+      query("#post_1 .post-retort-container button.post-retort:has(img[alt=':smile:']) .post-retort__count").innerText,
+      "2",
+    );
+    assert.ok(
+      visible("#post_1 .post-retort-container button.post-retort.not-my-retort img[alt=':ocean:']"),
+    );
+    assert.ok(
+      visible("#post_1 .post-retort-container button.post-retort.my-retort img[alt=':+1:']"),
     );
   });
 });
