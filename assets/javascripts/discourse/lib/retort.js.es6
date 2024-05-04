@@ -124,43 +124,39 @@ export default Object.create({
       return;
     }
     const targetRetort = post.retorts.find((retort) => retort.emoji === emoji);
-    if (!targetRetort) {
-      post.retorts.push({
-        post_id: postId,
-        emoji,
-        usernames: [currentUser.username],
-      });
-      post.my_retorts.push({
-        emoji,
-        updated_at: new Date().toISOString(),
-      });
-    } else {
-      const isMyRetort = post.my_retorts?.find((retort) => retort.emoji === emoji) ? true : false;
-      if (isMyRetort) {
-        //remove username from targetRetort
-        if (targetRetort.usernames.includes(currentUser.username)) {
-          // check if username already exists in targetRetort
-          // this may caused by messagebus update too fast
-          const index = targetRetort.usernames.indexOf(currentUser.username);
-          targetRetort.usernames.splice(index, 1);
-        }
+    const isMyRetort = post.my_retorts?.find((retort) => retort.emoji === emoji) ? true : false;
+    if (isMyRetort) {
+      //remove username from targetRetort
+      if (targetRetort && targetRetort.usernames.includes(currentUser.username)) {
+        // check if username already exists in targetRetort
+        // this may caused by messagebus update too fast
+        const index = targetRetort.usernames.indexOf(currentUser.username);
+        targetRetort.usernames.splice(index, 1);
         if (targetRetort.usernames.length <= 0) {
           const retortIndex = post.retorts.findIndex((retort) => retort.emoji === emoji);
           post.retorts.splice(retortIndex, 1);
         }
-        //remove retort from my_retorts
-        const myRetortIndex = post.my_retorts.findIndex((retort) => retort.emoji === emoji);
-        post.my_retorts.splice(myRetortIndex, 1);
+      }
+      //remove retort from my_retorts
+      const myRetortIndex = post.my_retorts.findIndex((retort) => retort.emoji === emoji);
+      post.my_retorts.splice(myRetortIndex, 1);
+    } else {
+      post.my_retorts.push({
+        emoji,
+        updated_at: new Date().toISOString(),
+      });
+      if (!targetRetort) {
+        post.retorts.push({
+          post_id: postId,
+          emoji,
+          usernames: [currentUser.username],
+        });
       } else {
         if (!targetRetort.usernames.includes(currentUser.username)) {
           // check if username already exists in targetRetort
           // this may caused by messagebus update too fast
           targetRetort.usernames.push(currentUser.username);
         }
-        post.my_retorts.push({
-          emoji,
-          updated_at: new Date().toISOString(),
-        });
       }
     }
     widget.scheduleRerender();
