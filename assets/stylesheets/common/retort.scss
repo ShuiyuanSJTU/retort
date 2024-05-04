@@ -30,7 +30,7 @@
   display: inline-flex;
   align-items: center;
 
-  &[disabled=true] {
+  &.disabled {
     cursor: not-allowed;
   }
 

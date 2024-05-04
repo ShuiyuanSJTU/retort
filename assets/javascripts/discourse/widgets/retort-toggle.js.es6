@@ -18,29 +18,26 @@ export default createWidget("retort-toggle", {
   },
 
   buildClasses() {
-    if (this.state.displayUsernames.length <= 0) {return ["nobody-retort"];}
-    else if (this.state.isMyRetort) {return ["my-retort"];}
-    else {return ["not-my-retort"];}
-  },
-
-  // eslint-disable-next-line no-unused-vars
-  buildAttributes(attrs) {
-    if (this.disabled()) { return { disabled: true }; }
-    return {};
+    const classList = [];
+    if (this.state.displayUsernames.length <= 0) { classList.push("nobody-retort");}
+    else if (this.state.isMyRetort) { classList.push("my-retort");}
+    else { classList.push("not-my-retort"); }
+    if (this.disabled()) { classList.push("disabled"); }
+    return classList;
   },
 
   click() {
-    if (this.currentUser == null) {
+    if (this.currentUser == null || this.disabled()) {
       return;
     }
     const { post, emoji } = this.state;
     Retort.updateRetort(post, emoji)
-      .then(Retort.localUpdateWidget(post.id, emoji))
+      .then(() => Retort.localUpdateWidget(post.id, emoji))
       .catch(popupAjaxError);
   },
 
   disabled() {
-    if (!this.state.post.can_retort) {return true;}
+    if (!this.state.post.can_retort) { return true; }
     if (this.state.isMyRetort) {
       const diff = new Date() - this.state.myRetortUpdateTime;
       if (diff > this.siteSettings.retort_withdraw_tolerance * 1000) {

@@ -52,12 +52,12 @@ acceptance("Poll results", function (needs) {
       "The retort button is visible"
     );
     assert.strictEqual(
-      query("#post_1 .post-retort-container button.post-retort.my-retort[disabled=true] img").getAttribute('alt'),
+      query("#post_1 .post-retort-container button.post-retort.my-retort.disabled img").getAttribute('alt'),
       ":pouting_cat:",
       "The retort button is disabled"
     );
     assert.strictEqual(
-      query("#post_1 .post-retort-container button.post-retort.my-retort:not([disabled=true]) img").getAttribute('alt'),
+      query("#post_1 .post-retort-container button.post-retort.my-retort:not(.disabled) img").getAttribute('alt'),
       ":+1:",
       "The retort button is enabled"
     );
@@ -81,12 +81,12 @@ acceptance("Poll results", function (needs) {
       "The retort button is not visible"
     );
     assert.strictEqual(
-      count("#post_2 .post-retort-container button.post-retort[disabled=true] img"),
+      count("#post_2 .post-retort-container button.post-retort.disabled img"),
       3,
       "The retort button is disabled"
     );
     assert.ok(
-      !exists("#post_2 .post-retort-container button.post-retort:not([disabled=true]) img"),
+      !exists("#post_2 .post-retort-container button.post-retort:not(.disabled) img"),
       "No retort button is enabled"
     );
   });
@@ -108,7 +108,7 @@ acceptance("Poll results", function (needs) {
       4,
       "There are 4 retorts in the post"
     );
-    for (const el of queryAll("#post_1 .post-retort-container button.post-retort:not([disabled=true])")) {
+    for (const el of queryAll("#post_1 .post-retort-container button.post-retort:not(.disabled)")) {
       await click(el);
     }
     assert.ok(
