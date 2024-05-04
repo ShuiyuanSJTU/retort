@@ -14,13 +14,13 @@ export default Object.create({
     this.set("topic", topic);
     messageBus.subscribe(
       `/retort/topics/${this.topic.id}`,
-      ({ id, retorts, my_retorts, can_retort, can_remove_retort }) => {
+      ({ id, retorts }) => {
         const post = this.postFor(id);
         if (!post) {
           return;
         }
 
-        post.setProperties({ retorts, my_retorts, can_retort, can_remove_retort });
+        post.setProperties({ retorts });
         this.get(`widgets.${id}`).scheduleRerender();
       }
     );
@@ -148,7 +148,11 @@ export default Object.create({
         const myRetortIndex = post.my_retorts.findIndex((retort) => retort.emoji === emoji);
         post.my_retorts.splice(myRetortIndex, 1);
       } else {
-        targetRetort.usernames.push(currentUser.username);
+        if (!targetRetort.usernames.includes(currentUser.username)) {
+          // check if username already exists in targetRetort
+          // this may caused by messagebus update too fast
+          targetRetort.usernames.push(currentUser.username);
+        }
         post.my_retorts.push({
           emoji,
           updated_at: new Date().toISOString(),

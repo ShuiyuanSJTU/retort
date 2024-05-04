@@ -75,7 +75,10 @@ class DiscourseRetort::RetortsController < ::ApplicationController
   end
 
   def serialized_post_retorts
-    ::PostSerializer.new(post.reload, scope: Guardian.new, root: false).as_json
+    {
+      id: post.id,
+      retorts: ::PostSerializer.new(post.reload, scope: Guardian.new, root: false).retorts
+    }
   end
 
   def respond_with_unprocessable(error)
