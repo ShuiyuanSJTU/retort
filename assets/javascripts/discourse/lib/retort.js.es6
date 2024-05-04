@@ -138,8 +138,12 @@ export default Object.create({
       const isMyRetort = post.my_retorts?.find((retort) => retort.emoji === emoji) ? true : false;
       if (isMyRetort) {
         //remove username from targetRetort
-        const index = targetRetort.usernames.indexOf(currentUser.username);
-        targetRetort.usernames.splice(index, 1);
+        if (targetRetort.usernames.includes(currentUser.username)) {
+          // check if username already exists in targetRetort
+          // this may caused by messagebus update too fast
+          const index = targetRetort.usernames.indexOf(currentUser.username);
+          targetRetort.usernames.splice(index, 1);
+        }
         if (targetRetort.usernames.length <= 0) {
           const retortIndex = post.retorts.findIndex((retort) => retort.emoji === emoji);
           post.retorts.splice(retortIndex, 1);
