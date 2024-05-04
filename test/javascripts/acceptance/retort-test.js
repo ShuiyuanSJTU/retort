@@ -11,7 +11,7 @@ import {
 } from "discourse/tests/helpers/qunit-helpers";
 import retortFixtures from "../fixtures/topic-with-retort";
 
-acceptance("Poll results", function (needs) {
+acceptance("Retorts", function (needs) {
   needs.user({ username: "pangbo" });
   needs.settings({ retort_withdraw_tolerance: 3600 });
 
