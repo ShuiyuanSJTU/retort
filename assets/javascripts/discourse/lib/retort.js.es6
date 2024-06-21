@@ -6,7 +6,8 @@ import { getOwnerWithFallback } from "discourse-common/lib/get-owner";
 export default Object.create({
   topic: { postStream: { posts: [] } },
 
-  initialize(messageBus, topic) {
+  activate(topic) {
+    const messageBus = getOwnerWithFallback(this).lookup("service:message-bus");
     if (this.topic.id) {
       messageBus.unsubscribe(`/retort/topics/${this.topic.id}`);
     }
@@ -24,9 +25,6 @@ export default Object.create({
         this.get(`widgets.${id}`).scheduleRerender();
       }
     );
-
-    const siteSettings = getOwnerWithFallback(this).lookup("site-settings:main");
-    this.set("siteSettings", siteSettings);
   },
 
   postFor(id) {
@@ -62,7 +60,8 @@ export default Object.create({
   },
 
   disabledCategories() {
-    const categories = this.siteSettings.retort_disabled_categories.split("|");
+    const siteSettings = getOwnerWithFallback(this).lookup("site-settings:main");
+    const categories = siteSettings.retort_disabled_categories.split("|");
     return categories.map((cat) => parseInt(cat, 10)).filter(Boolean);
   },
 
@@ -120,11 +119,11 @@ export default Object.create({
     const currentUser = getOwnerWithFallback(this).lookup("service:current-user");
     const post = this.postFor(postId);
     const widget = this.get(`widgets.${postId}`);
-    if (!post || !widget) {
+    if (!post || !widget || !currentUser) {
       return;
     }
     const targetRetort = post.retorts.find((retort) => retort.emoji === emoji);
-    const isMyRetort = post.my_retorts?.find((retort) => retort.emoji === emoji) ? true : false;
+    const isMyRetort = post.my_retorts?.any((retort) => retort.emoji === emoji);
     if (isMyRetort) {
       //remove username from targetRetort
       if (targetRetort && targetRetort.usernames.includes(currentUser.username)) {

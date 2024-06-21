@@ -1,5 +1,4 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
-import { getOwnerWithFallback } from "discourse-common/lib/get-owner";
 import Retort from "../lib/retort";
 
 function initializePlugin(api) {
@@ -40,8 +39,7 @@ function initializePlugin(api) {
     pluginId: "retort",
 
     setupController(controller, model) {
-      const messageBus = getOwnerWithFallback(this).lookup("message-bus:main");
-      Retort.initialize(messageBus, model);
+      Retort.activate(model);
       this._super(controller, model);
     },
   });
