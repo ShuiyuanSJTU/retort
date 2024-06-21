@@ -27,6 +27,15 @@ export default Object.create({
     );
   },
 
+  deactivate() {
+    const messageBus = getOwnerWithFallback(this).lookup("service:message-bus");
+    if (this.topic.id) {
+      messageBus.unsubscribe(`/retort/topics/${this.topic.id}`);
+    }
+    this.set("topic", { postStream: { posts: [] } });
+    this.set("widgets", {});
+  },
+
   postFor(id) {
     return (this.get("topic.postStream.posts") || []).find((p) => p.id === id);
   },

@@ -42,6 +42,11 @@ function initializePlugin(api) {
       Retort.activate(model);
       this._super(controller, model);
     },
+
+    deactivate() {
+      Retort.deactivate();
+      this._super();
+    }
   });
 
   api.addPostMenuButton("retort", (attrs) => {
