@@ -9,6 +9,6 @@ class CreateRetortTable < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :retorts, [:post_id, :user_id, :emoji], unique: true
+    add_index :retorts, %i[post_id user_id emoji], unique: true
   end
 end

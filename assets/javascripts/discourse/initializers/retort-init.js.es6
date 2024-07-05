@@ -13,13 +13,15 @@ function initializePlugin(api) {
     pluginId: "retort",
     actions: {
       save() {
-        this.get('saveAttrNames').push('custom_fields');
+        this.get("saveAttrNames").push("custom_fields");
         this._super();
-      }
-    }
+      },
+    },
   });
 
-  if (currentUser?.custom_fields?.disable_retorts) {return;}
+  if (currentUser?.custom_fields?.disable_retorts) {
+    return;
+  }
 
   api.decorateWidget("post-contents:after-cooked", (helper) => {
     let postId = helper.getModel().id;
@@ -27,7 +29,6 @@ function initializePlugin(api) {
 
     return helper.attach("post-retort-container", { post, currentUser });
   });
-
 
   api.addPostClassesCallback((attrs) => {
     if (!Retort.disableShowForPost(attrs.id)) {
@@ -46,7 +47,7 @@ function initializePlugin(api) {
     deactivate() {
       Retort.deactivate();
       this._super();
-    }
+    },
   });
 
   api.addPostMenuButton("retort", (attrs) => {
@@ -67,7 +68,6 @@ function initializePlugin(api) {
     const post = this.findAncestorModel();
     Retort.openPicker(post);
   });
-
 }
 
 export default {

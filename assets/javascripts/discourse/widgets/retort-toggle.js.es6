@@ -9,10 +9,16 @@ export default createWidget("retort-toggle", {
 
   buildClasses(attrs) {
     const classList = [];
-    if (attrs.usernames.length <= 0) { classList.push("nobody-retort");}
-    else if (this.isMyRetort()) { classList.push("my-retort");}
-    else { classList.push("not-my-retort"); }
-    if (this.disabled()) { classList.push("disabled"); }
+    if (attrs.usernames.length <= 0) {
+      classList.push("nobody-retort");
+    } else if (this.isMyRetort()) {
+      classList.push("my-retort");
+    } else {
+      classList.push("not-my-retort");
+    }
+    if (this.disabled()) {
+      classList.push("disabled");
+    }
     return classList;
   },
 
@@ -27,17 +33,23 @@ export default createWidget("retort-toggle", {
   },
 
   isMyRetort() {
-    const my_retort = this.attrs.post.my_retorts?.find((retort) => retort.emoji === this.attrs.emoji);
+    const my_retort = this.attrs.post.my_retorts?.find(
+      (retort) => retort.emoji === this.attrs.emoji
+    );
     return !!my_retort;
   },
 
   myRetortUpdateTime() {
-    const my_retort = this.attrs.post.my_retorts?.find((retort) => retort.emoji === this.attrs.emoji);
+    const my_retort = this.attrs.post.my_retorts?.find(
+      (retort) => retort.emoji === this.attrs.emoji
+    );
     return my_retort ? new Date(my_retort?.updated_at) : undefined;
   },
 
   disabled() {
-    if (!this.attrs.post.can_retort) { return true; }
+    if (!this.attrs.post.can_retort) {
+      return true;
+    }
     if (this.isMyRetort()) {
       const diff = new Date() - this.myRetortUpdateTime();
       if (diff > this.siteSettings.retort_withdraw_tolerance * 1000) {
@@ -50,7 +62,9 @@ export default createWidget("retort-toggle", {
 
   html(attrs) {
     const { emoji, usernames, emojiUrl } = this.attrs;
-    if (usernames.length <= 0) {return [];}
+    if (usernames.length <= 0) {
+      return [];
+    }
     const res = [
       h("img.emoji", { src: emojiUrl, alt: `:${emoji}:` }),
       h("span.post-retort__count", usernames.length.toString()),

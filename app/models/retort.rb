@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_dependency 'rate_limiter'
+require_dependency "rate_limiter"
 
 class Retort < ActiveRecord::Base
   belongs_to :post
@@ -15,11 +15,7 @@ class Retort < ActiveRecord::Base
   end
 
   def toggle!
-    if self.deleted?
-      self.recover!
-    else
-      self.withdraw!
-    end
+    self.deleted? ? self.recover! : self.withdraw!
   end
 
   def withdraw!
@@ -47,7 +43,8 @@ class Retort < ActiveRecord::Base
   include RateLimiter::OnCreateRecord
   rate_limit :retort_rate_limiter
   def retort_rate_limiter
-    @rate_limiter ||= RateLimiter.new(user, "create_retort", retort_max_per_day, 1.day.to_i)
+    @rate_limiter ||=
+      RateLimiter.new(user, "create_retort", retort_max_per_day, 1.day.to_i)
   end
 
   def retort_max_per_day
@@ -56,7 +53,7 @@ class Retort < ActiveRecord::Base
 
   def retort_trust_multiplier
     return 1.0 if user&.trust_level.to_i < 2
-      SiteSetting.send(:"retort_tl#{user.trust_level}_max_per_day_multiplier")
+    SiteSetting.send(:"retort_tl#{user.trust_level}_max_per_day_multiplier")
   end
 
   def self.cache_key(post_id)

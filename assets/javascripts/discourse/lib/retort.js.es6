@@ -1,4 +1,4 @@
-import Object from '@ember/object';
+import Object from "@ember/object";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 import { getOwnerWithFallback } from "discourse-common/lib/get-owner";
@@ -69,7 +69,8 @@ export default Object.create({
   },
 
   disabledCategories() {
-    const siteSettings = getOwnerWithFallback(this).lookup("site-settings:main");
+    const siteSettings =
+      getOwnerWithFallback(this).lookup("site-settings:main");
     const categories = siteSettings.retort_disabled_categories.split("|");
     return categories.map((cat) => parseInt(cat, 10)).filter(Boolean);
   },
@@ -81,15 +82,16 @@ export default Object.create({
     }
     const categoryId = post.get("topic.category.id");
     const disabledCategories = this.disabledCategories();
-    return (
-      categoryId &&
-      disabledCategories.includes(categoryId)
-    );
+    return categoryId && disabledCategories.includes(categoryId);
   },
 
   disableRetortButton(postId) {
-    if (this.disableShowForPost(postId)) {return true;}
-    if (this.topic.archived) {return true;}
+    if (this.disableShowForPost(postId)) {
+      return true;
+    }
+    if (this.topic.archived) {
+      return true;
+    }
     return false;
   },
 
@@ -104,28 +106,32 @@ export default Object.create({
     this.set("picker.post", post);
     // eslint-disable-next-line no-unused-vars
     this.set("picker.onEmojiPickerClose", (event) => {
-      const currentRetortAnchor = document.querySelector(".emoji-picker-anchor.retort");
+      const currentRetortAnchor = document.querySelector(
+        ".emoji-picker-anchor.retort"
+      );
       if (currentRetortAnchor) {
         currentRetortAnchor.classList.remove("emoji-picker-anchor");
       }
       this.set("picker.isActive", false);
-    }
-    );
+    });
   },
 
   setPicker(picker) {
     this.set("picker", picker);
     this.set("picker.emojiSelected", (emoji) =>
-      this.updateRetort(picker.post, emoji).then(() => {
+      this.updateRetort(picker.post, emoji)
+        .then(() => {
           picker.set("isActive", false);
           this.localUpdateWidget(picker.post.id, emoji);
-        }
-      ).catch(popupAjaxError)
+        })
+        .catch(popupAjaxError)
     );
   },
 
   localUpdateWidget(postId, emoji) {
-    const currentUser = getOwnerWithFallback(this).lookup("service:current-user");
+    const currentUser = getOwnerWithFallback(this).lookup(
+      "service:current-user"
+    );
     const post = this.postFor(postId);
     const widget = this.get(`widgets.${postId}`);
     if (!post || !widget || !currentUser) {
@@ -135,18 +141,25 @@ export default Object.create({
     const isMyRetort = post.my_retorts?.any((retort) => retort.emoji === emoji);
     if (isMyRetort) {
       //remove username from targetRetort
-      if (targetRetort && targetRetort.usernames.includes(currentUser.username)) {
+      if (
+        targetRetort &&
+        targetRetort.usernames.includes(currentUser.username)
+      ) {
         // check if username already exists in targetRetort
         // this may caused by messagebus update too fast
         const index = targetRetort.usernames.indexOf(currentUser.username);
         targetRetort.usernames.splice(index, 1);
         if (targetRetort.usernames.length <= 0) {
-          const retortIndex = post.retorts.findIndex((retort) => retort.emoji === emoji);
+          const retortIndex = post.retorts.findIndex(
+            (retort) => retort.emoji === emoji
+          );
           post.retorts.splice(retortIndex, 1);
         }
       }
       //remove retort from my_retorts
-      const myRetortIndex = post.my_retorts.findIndex((retort) => retort.emoji === emoji);
+      const myRetortIndex = post.my_retorts.findIndex(
+        (retort) => retort.emoji === emoji
+      );
       post.my_retorts.splice(myRetortIndex, 1);
     } else {
       post.my_retorts.push({
@@ -168,5 +181,5 @@ export default Object.create({
       }
     }
     widget.scheduleRerender();
-  }
+  },
 });

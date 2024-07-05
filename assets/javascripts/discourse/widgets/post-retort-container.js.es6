@@ -37,28 +37,26 @@ createWidget("post-retort-container", {
       .filter(({ emojiUrl }) => emojiUrl)
       .sort((a, b) => a.emoji.localeCompare(b.emoji));
     const retort_widgets = retorts.map(({ emoji, emojiUrl, usernames }) => {
-        let displayUsernames = usernames;
-        // check if hide_ignored_retorts is enabled
-        if (currentUser?.custom_fields?.hide_ignored_retorts) {
-          const ignoredUsers = new Set(currentUser.ignored_users);
-          displayUsernames = usernames.filter((username) => {
-            return !ignoredUsers.has(username);
-          });
-        }
-        if (displayUsernames.length > 0) {
-          return this.attach("retort-toggle", {
-            emoji,
-            emojiUrl,
-            post,
-            usernames: displayUsernames,
-            currentUser,
-          });
-        }
-        else {
-          return null;
-        }
+      let displayUsernames = usernames;
+      // check if hide_ignored_retorts is enabled
+      if (currentUser?.custom_fields?.hide_ignored_retorts) {
+        const ignoredUsers = new Set(currentUser.ignored_users);
+        displayUsernames = usernames.filter((username) => {
+          return !ignoredUsers.has(username);
+        });
       }
-    );
+      if (displayUsernames.length > 0) {
+        return this.attach("retort-toggle", {
+          emoji,
+          emojiUrl,
+          post,
+          usernames: displayUsernames,
+          currentUser,
+        });
+      } else {
+        return null;
+      }
+    });
     return retort_widgets;
-  }
+  },
 });

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 class DiscourseRetort::RetortsController < ::ApplicationController
   requires_plugin DiscourseRetort::PLUGIN_NAME
-  before_action :verify_post_and_user, only: [:update, :remove]
+  before_action :verify_post_and_user, only: %i[update remove]
 
   def update
     params.require(:retort)
@@ -17,31 +17,39 @@ class DiscourseRetort::RetortsController < ::ApplicationController
       return
     end
 
-    exist_record = Retort.find_by(post_id: post.id, user_id: current_user.id, emoji: emoji)
+    exist_record =
+      Retort.find_by(post_id: post.id, user_id: current_user.id, emoji: emoji)
     if exist_record.present?
       if exist_record.deleted?
         # Record has been deleted, try to create again
         guardian.ensure_can_recover_retort!(exist_record)
         exist_record.recover!
-        DiscourseEvent.trigger(:create_retort,post,current_user,emoji)
+        DiscourseEvent.trigger(:create_retort, post, current_user, emoji)
       else
         guardian.ensure_can_delete_retort!(exist_record)
         exist_record.withdraw!
-        DiscourseEvent.trigger(:withdraw_retort,post,current_user,emoji)
+        DiscourseEvent.trigger(:withdraw_retort, post, current_user, emoji)
       end
     else
       guardian.ensure_can_create!(Retort, post)
       begin
-        exist_record = Retort.create(post_id: post.id, user_id: current_user.id, emoji: emoji)
-        DiscourseEvent.trigger(:create_retort,post,current_user,emoji) unless exist_record.nil?
+        exist_record =
+          Retort.create(
+            post_id: post.id,
+            user_id: current_user.id,
+            emoji: emoji
+          )
+        unless exist_record.nil?
+          DiscourseEvent.trigger(:create_retort, post, current_user, emoji)
+        end
       rescue ActiveRecord::RecordNotUnique
         # Concurrent creation, ignore
       end
     end
 
-    MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}", serialized_post_retorts
+    MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}",
+                       serialized_post_retorts
     render json: { success: :ok }
-
   end
 
   def remove
@@ -58,7 +66,8 @@ class DiscourseRetort::RetortsController < ::ApplicationController
         details: I18n.t("retort.log.remove", emoji: emoji)
       )
     end
-    MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}", serialized_post_retorts
+    MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}",
+                       serialized_post_retorts
     render json: { success: :ok }
   end
 
@@ -77,7 +86,12 @@ class DiscourseRetort::RetortsController < ::ApplicationController
   def serialized_post_retorts
     {
       id: post.id,
-      retorts: ::PostSerializer.new(post.reload, scope: Guardian.new, root: false).retorts
+      retorts:
+        ::PostSerializer.new(
+          post.reload,
+          scope: Guardian.new,
+          root: false
+        ).retorts
     }
   end
 
