@@ -7,21 +7,9 @@ createWidget("post-retort-container", {
 
   buildKey: (attrs) => `post-retort-container-${attrs.post.id}`,
 
-  defaultState({ post }) {
-    return { post };
-  },
-
-  init(attrs) {
-    Retort.storeWidget(attrs.post.id, this);
-  },
-
-  destroy() {
-    Retort.removeStoredWidget(this.state.post.id);
-  },
-
   html(attrs) {
-    const { post, currentUser } = attrs;
-    if (Retort.disableShowForPost(post.id)) {
+    const { post } = attrs;
+    if (Retort.disableShowForTopic(post.topic)) {
       return;
     }
 
@@ -39,8 +27,8 @@ createWidget("post-retort-container", {
     const retort_widgets = retorts.map(({ emoji, emojiUrl, usernames }) => {
       let displayUsernames = usernames;
       // check if hide_ignored_retorts is enabled
-      if (currentUser?.custom_fields?.hide_ignored_retorts) {
-        const ignoredUsers = new Set(currentUser.ignored_users);
+      if (this.currentUser?.custom_fields?.hide_ignored_retorts) {
+        const ignoredUsers = new Set(this.currentUser.ignored_users);
         displayUsernames = usernames.filter((username) => {
           return !ignoredUsers.has(username);
         });
@@ -51,7 +39,6 @@ createWidget("post-retort-container", {
           emojiUrl,
           post,
           usernames: displayUsernames,
-          currentUser,
         });
       } else {
         return null;

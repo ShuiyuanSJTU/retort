@@ -2,7 +2,7 @@ import { withPluginApi } from "discourse/lib/plugin-api";
 import Retort from "../lib/retort";
 
 function initializePlugin(api) {
-  const { retort_enabled } = api.container.lookup("site-settings:main");
+  const { retort_enabled } = api._lookupContainer("site-settings:main");
 
   if (!retort_enabled) {
     return;
@@ -23,36 +23,46 @@ function initializePlugin(api) {
     return;
   }
 
-  api.decorateWidget("post-contents:after-cooked", (helper) => {
-    let postId = helper.getModel().id;
-    let post = Retort.postFor(postId);
+  api.includePostAttributes("can_retort", "my_retorts", "retorts");
 
-    return helper.attach("post-retort-container", { post, currentUser });
+  api.decorateWidget("post-contents:after-cooked", (helper) => {
+    const post = helper.getModel();
+    return helper.attach("post-retort-container", { post });
   });
 
   api.addPostClassesCallback((attrs) => {
-    if (!Retort.disableShowForPost(attrs.id)) {
+    if (!Retort.disableShowForTopic(attrs.topic)) {
       return ["retort"];
     }
   });
 
-  api.modifyClass("route:topic", {
+  api.modifyClass("controller:topic", {
     pluginId: "retort",
 
-    setupController(controller, model) {
-      Retort.activate(model);
-      this._super(controller, model);
+    onRetortUpdate(data) {
+      const { id, retorts } = data;
+      const post = this.get("model.postStream.posts").findBy("id", id);
+      post.setProperties({ retorts });
+      this.appEvents.trigger("post-stream:refresh", { id: post.get("id") });
     },
 
-    deactivate() {
-      Retort.deactivate();
+    subscribe() {
       this._super();
+
+      this.messageBus.subscribe(
+        `/retort/topics/${this.get("model.id")}`,
+        this.onRetortUpdate.bind(this)
+      );
     },
+
+    unsubscribe() {
+      this._super();
+      this.messageBus.unsubscribe("/retort/topics/*");
+    }
   });
 
-  api.addPostMenuButton("retort", (attrs) => {
-    const post = Retort.postFor(attrs.id);
-    if (!post.can_retort) {
+  api.addPostMenuButton("retort", ({ can_retort }) => {
+    if (!can_retort) {
       return;
     }
     return {
@@ -71,7 +81,7 @@ function initializePlugin(api) {
 }
 
 export default {
-  name: "retort-button",
+  name: "retort",
   initialize: function () {
     withPluginApi("0.8.6", (api) => initializePlugin(api));
   },

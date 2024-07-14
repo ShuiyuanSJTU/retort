@@ -27,16 +27,25 @@ export default createWidget("retort-toggle", {
       return;
     }
     const { post, emoji } = this.attrs;
-    Retort.updateRetort(post, emoji)
-      .then(() => Retort.localUpdateWidget(post.id, emoji))
-      .catch(popupAjaxError);
+    if (this.isMyRetort()) {
+      Retort.withdrawRetort(post, emoji)
+        .then((data) => {
+          post.set("retorts", data.retorts);
+          this.scheduleRerender();
+        })
+        .catch(popupAjaxError);
+    } else {
+      Retort.createRetort(post, emoji)
+        .then((data) => {
+          post.set("retorts", data.retorts);
+          this.scheduleRerender();
+        })
+        .catch(popupAjaxError);
+    }
   },
 
   isMyRetort() {
-    const my_retort = this.attrs.post.my_retorts?.find(
-      (retort) => retort.emoji === this.attrs.emoji
-    );
-    return !!my_retort;
+    return this.attrs.usernames.any((username) => username === this.currentUser?.username);
   },
 
   myRetortUpdateTime() {

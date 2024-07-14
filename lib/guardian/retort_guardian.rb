@@ -35,7 +35,7 @@ module DiscourseRetort::RetortGuardian
     true
   end
 
-  def can_delete_retort?(retort)
+  def can_withdraw_retort?(retort)
     return false if retort.nil?
     return false unless is_my_own?(retort)
     if retort.updated_at < SiteSetting.retort_withdraw_tolerance.second.ago

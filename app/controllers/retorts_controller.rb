@@ -1,7 +1,72 @@
 # frozen_string_literal: true
 class DiscourseRetort::RetortsController < ::ApplicationController
   requires_plugin DiscourseRetort::PLUGIN_NAME
-  before_action :verify_post_and_user, only: %i[update remove]
+  before_action :verify_post_and_user, only: %i[update remove create withdraw]
+
+  def create
+    params.require(:retort)
+    emoji = params[:retort]
+    if !Emoji.exists?(emoji)
+      respond_with_unprocessable(I18n.t("retort.error.missing_emoji"))
+      return
+    end
+
+    disabled_emojis = SiteSetting.retort_disabled_emojis.split("|")
+    if disabled_emojis.include?(emoji)
+      respond_with_unprocessable(I18n.t("retort.error.disabled_emojis"))
+      return
+    end
+
+    exist_record =
+      Retort.find_by(post_id: post.id, user_id: current_user.id, emoji: emoji)
+    if exist_record.present?
+      if exist_record.deleted?
+        # Record has been deleted, try to create again
+        guardian.ensure_can_recover_retort!(exist_record)
+        exist_record.recover!
+        DiscourseEvent.trigger(:create_retort, post, current_user, emoji)
+      end
+    else
+      guardian.ensure_can_create!(Retort, post)
+      begin
+        exist_record =
+          Retort.create(
+            post_id: post.id,
+            user_id: current_user.id,
+            emoji: emoji
+          )
+        unless exist_record.nil?
+          DiscourseEvent.trigger(:create_retort, post, current_user, emoji)
+        end
+      rescue ActiveRecord::RecordNotUnique
+        # Concurrent creation, ignore
+      end
+    end
+    MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}",
+                       serialized_post_retorts
+    render json: serialized_post_retorts
+  end
+
+  def withdraw
+    params.require(:retort)
+    emoji = params[:retort]
+
+    exist_record =
+      Retort.find_by(post_id: post.id, user_id: current_user.id, emoji: emoji)
+    if exist_record.present? && !exist_record.deleted?
+      # Record has been deleted, try to create again
+      guardian.ensure_can_withdraw_retort!(exist_record)
+      exist_record.withdraw!
+      DiscourseEvent.trigger(:withdraw_retort, post, current_user, emoji)
+    else
+      respond_with_unprocessable(I18n.t("retort.error.not_found"))
+      return
+    end
+
+    MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}",
+                       serialized_post_retorts
+    render json: serialized_post_retorts
+  end
 
   def update
     params.require(:retort)
@@ -26,7 +91,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
         exist_record.recover!
         DiscourseEvent.trigger(:create_retort, post, current_user, emoji)
       else
-        guardian.ensure_can_delete_retort!(exist_record)
+        guardian.ensure_can_withdraw_retort!(exist_record)
         exist_record.withdraw!
         DiscourseEvent.trigger(:withdraw_retort, post, current_user, emoji)
       end
@@ -49,7 +114,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
 
     MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}",
                        serialized_post_retorts
-    render json: { success: :ok }
+    render json: serialized_post_retorts
   end
 
   def remove
@@ -68,7 +133,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
     end
     MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}",
                        serialized_post_retorts
-    render json: { success: :ok }
+    render json: serialized_post_retorts
   end
 
   private

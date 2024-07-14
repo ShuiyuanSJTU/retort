@@ -1,12 +1,13 @@
 import { click, visit } from "@ember/test-helpers";
 import { test } from "qunit";
+import sinon from "sinon";
+import pretender, {response} from "discourse/tests/helpers/create-pretender";
 import {
   acceptance,
   count,
   exists,
   publishToMessageBus,
   query,
-  queryAll,
   visible,
 } from "discourse/tests/helpers/qunit-helpers";
 import retortFixtures from "../fixtures/topic-with-retort";
@@ -23,11 +24,13 @@ acceptance("Retorts", function (needs) {
       );
     });
 
-    server.post("/retorts/398.json", () => {
-      return helper.success();
+    server.put("/retorts/398.json", () => {
+      return helper.response(
+        retortFixtures["put:/retorts/398.json"]
+      );
     });
 
-    server.post("/retorts/421.json", () => helper.response(403, {
+    server.put("/retorts/421.json", () => helper.response(403, {
       "errors": [
         "FAIL"
       ],
@@ -101,32 +104,33 @@ acceptance("Retorts", function (needs) {
     );
   });
 
-  test("create or withdraw", async function (assert) {
+  test("update with response", async function (assert) {
+    const putEndpoint = sinon.spy();
+    const deleteEndpoint = sinon.spy();
     await visit("/t/retort-topic/114514");
     assert.strictEqual(
       count("#post_1 .post-retort-container button.post-retort"),
       4,
       "There are 4 retorts in the post"
     );
-    for (const el of queryAll("#post_1 .post-retort-container button.post-retort:not(.disabled)")) {
-      await click(el);
-    }
-    assert.ok(
-      !query("#post_1 button.post-retort:has(img[alt=':+1:'])").classList.contains("my-retort")
+    pretender.put("/retorts/398.json", () => {
+      putEndpoint();
+      return response(200);
+    });
+    pretender.delete("/retorts/398.json", () => {
+      deleteEndpoint();
+      return response(200);
+    });
+    await click("#post_1 .post-retort-container button.post-retort:not(.disabled)");
+    assert.strictEqual(
+      deleteEndpoint.calledOnce,
+      true,
+      "requested once for withdraw"
     );
     assert.strictEqual(
-      query("#post_1 button.post-retort:has(img[alt=':+1:']) .post-retort__count").innerText,
-      "6",
-    );
-    assert.ok(
-      query("#post_1 button.post-retort:has(img[alt=':ocean:'])").classList.contains("my-retort")
-    );
-    assert.strictEqual(
-      query("#post_1 button.post-retort:has(img[alt=':ocean:']) .post-retort__count").innerText,
-      "9",
-    );
-    assert.ok(
-      !visible("#post_1 button.post-retort:has(img[alt=':smile:'])")
+      putEndpoint.notCalled,
+      true,
+      "no request for create"
     );
   });
 

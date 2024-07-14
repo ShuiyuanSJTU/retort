@@ -19,14 +19,14 @@ describe DiscourseRetort::RetortsController do
       end
 
       it "can not create without sign in" do
-        post "/retorts/#{first_post.id}.json", params: { retort: "heart" }
+        put "/retorts/#{first_post.id}.json", params: { retort: "heart" }
         expect(response.status).to eq(403)
         expect(Retort.find_by(post_id: first_post.id, emoji: "heart")).to be_nil
       end
 
       it "can not create on invalid post" do
         sign_in(user)
-        post "/retorts/100000.json", params: { retort: "heart" }
+        put "/retorts/100000.json", params: { retort: "heart" }
         expect(response.status).to eq(403)
       end
 
@@ -34,9 +34,9 @@ describe DiscourseRetort::RetortsController do
         time = Time.new(2024, 12, 25, 01, 04, 44)
         travel_to time do
           sign_in(user)
-          post "/retorts/#{first_post.id}.json", params: { retort: "heart" }
+          put "/retorts/#{first_post.id}.json", params: { retort: "heart" }
         end
-        expect(JSON.parse(response.body)["success"]).to eq "ok"
+        expect(JSON.parse(response.body)["id"]).to eq first_post.id
         new_retort =
           Retort.find_by(
             post_id: first_post.id,
@@ -51,18 +51,18 @@ describe DiscourseRetort::RetortsController do
 
       it "can not create on disabled category post" do
         sign_in(user)
-        post "/retorts/#{another_post.id}.json", params: { retort: "heart" }
+        put "/retorts/#{another_post.id}.json", params: { retort: "heart" }
         expect(response.status).to eq(403)
       end
 
       it "can not create on disabled emoji" do
         sign_in(user)
-        post "/retorts/#{first_post.id}.json", params: { retort: "+1" }
+        put "/retorts/#{first_post.id}.json", params: { retort: "+1" }
         expect(response.status).to eq(422)
         expect(JSON.parse(response.body)["error"]).to eq I18n.t(
              "retort.error.disabled_emojis"
            )
-        post "/retorts/#{first_post.id}.json", params: { retort: "laughing" }
+        put "/retorts/#{first_post.id}.json", params: { retort: "laughing" }
         expect(response.status).to eq(422)
         expect(JSON.parse(response.body)["error"]).to eq I18n.t(
              "retort.error.disabled_emojis"
@@ -71,7 +71,7 @@ describe DiscourseRetort::RetortsController do
 
       it "can not create invalid emoji" do
         sign_in(user)
-        post "/retorts/#{first_post.id}.json", params: { retort: "invalid__" }
+        put "/retorts/#{first_post.id}.json", params: { retort: "invalid__" }
         expect(response.status).to eq(422)
         expect(JSON.parse(response.body)["error"]).to eq I18n.t(
              "retort.error.missing_emoji"
@@ -81,14 +81,14 @@ describe DiscourseRetort::RetortsController do
       it "can not create on archived post" do
         first_post.topic.update(archived: true)
         sign_in(user)
-        post "/retorts/#{first_post.id}.json", params: { retort: "heart" }
+        put "/retorts/#{first_post.id}.json", params: { retort: "heart" }
         expect(response.status).to eq(403)
       end
 
       it "can not create by silenced user" do
         user.update(silenced_till: 1.day.from_now)
         sign_in(user)
-        post "/retorts/#{first_post.id}.json", params: { retort: "heart" }
+        put "/retorts/#{first_post.id}.json", params: { retort: "heart" }
         expect(response.status).to eq(403)
       end
     end
@@ -107,9 +107,9 @@ describe DiscourseRetort::RetortsController do
       it "can withdraw within tolerance" do
         travel_to time + 1.seconds do
           sign_in(user)
-          post "/retorts/#{first_post.id}.json", params: { retort: emoji }
+          delete "/retorts/#{first_post.id}.json", params: { retort: emoji }
         end
-        expect(JSON.parse(response.body)["success"]).to eq "ok"
+        expect(JSON.parse(response.body)["id"]).to eq first_post.id
         retort =
           Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
         expect(retort.reload.deleted_at).to eq_time time + 1.seconds
@@ -121,7 +121,7 @@ describe DiscourseRetort::RetortsController do
       it "can not withdraw exceed tolerance" do
         travel_to time + 11.seconds do
           sign_in(user)
-          post "/retorts/#{first_post.id}.json", params: { retort: emoji }
+          delete "/retorts/#{first_post.id}.json", params: { retort: emoji }
         end
         expect(response.status).to eq(403)
         retort =
@@ -149,9 +149,9 @@ describe DiscourseRetort::RetortsController do
       it "can recover" do
         travel_to time + 1.seconds do
           sign_in(user)
-          post "/retorts/#{first_post.id}.json", params: { retort: emoji }
+          put "/retorts/#{first_post.id}.json", params: { retort: emoji }
         end
-        expect(JSON.parse(response.body)["success"]).to eq "ok"
+        expect(JSON.parse(response.body)["id"]).to eq first_post.id
         retort =
           Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
         expect(retort.deleted_at).to be_nil
@@ -163,9 +163,9 @@ describe DiscourseRetort::RetortsController do
       it "can recover even if exceed tolerance" do
         travel_to time + 11.seconds do
           sign_in(user)
-          post "/retorts/#{first_post.id}.json", params: { retort: emoji }
+          put "/retorts/#{first_post.id}.json", params: { retort: emoji }
         end
-        expect(JSON.parse(response.body)["success"]).to eq "ok"
+        expect(JSON.parse(response.body)["id"]).to eq first_post.id
         retort =
           Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
         expect(retort.deleted_at).to be_nil
@@ -200,9 +200,9 @@ describe DiscourseRetort::RetortsController do
       it "can withdraw within tolerance" do
         travel_to time + 7.seconds do
           sign_in(user)
-          post "/retorts/#{first_post.id}.json", params: { retort: emoji }
+          delete "/retorts/#{first_post.id}.json", params: { retort: emoji }
         end
-        expect(JSON.parse(response.body)["success"]).to eq "ok"
+        expect(JSON.parse(response.body)["id"]).to eq first_post.id
         retort =
           Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
         expect(retort.deleted_at).to eq_time time + 7.seconds
@@ -214,9 +214,9 @@ describe DiscourseRetort::RetortsController do
       it "can withdraw as tolerance is counted from last recovery" do
         travel_to time + 12.seconds do
           sign_in(user)
-          post "/retorts/#{first_post.id}.json", params: { retort: emoji }
+          delete "/retorts/#{first_post.id}.json", params: { retort: emoji }
         end
-        expect(JSON.parse(response.body)["success"]).to eq "ok"
+        expect(JSON.parse(response.body)["id"]).to eq first_post.id
         retort =
           Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
         expect(retort.deleted_at).to eq_time time + 12.seconds
@@ -228,7 +228,7 @@ describe DiscourseRetort::RetortsController do
       it "can not withdraw exceed tolerance" do
         travel_to time + 17.seconds do
           sign_in(user)
-          post "/retorts/#{first_post.id}.json", params: { retort: emoji }
+          delete "/retorts/#{first_post.id}.json", params: { retort: emoji }
         end
         expect(response.status).to eq(403)
         retort =
@@ -244,7 +244,7 @@ describe DiscourseRetort::RetortsController do
       it "can not remove" do
         Retort.create(post_id: first_post.id, user_id: user.id, emoji: "heart")
         sign_in(user)
-        delete "/retorts/#{first_post.id}.json", params: { retort: "heart" }
+        delete "/retorts/#{first_post.id}/all.json", params: { retort: "heart" }
         expect(response.status).to eq(403)
         expect(
           Retort.find_by(
@@ -277,9 +277,9 @@ describe DiscourseRetort::RetortsController do
 
       it "can remove" do
         sign_in(staff)
-        delete "/retorts/#{first_post.id}.json", params: { retort: emoji }
+        delete "/retorts/#{first_post.id}/all.json", params: { retort: emoji }
         expect(response.status).to eq(200)
-        expect(JSON.parse(response.body)["success"]).to eq "ok"
+        expect(JSON.parse(response.body)["id"]).to eq first_post.id
         expect(
           Retort.find_by(post_id: first_post.id, emoji: emoji, deleted_at: nil)
         ).to be_nil
@@ -295,13 +295,13 @@ describe DiscourseRetort::RetortsController do
           emoji: emoji
         ).withdraw!
         sign_in(staff)
-        delete "/retorts/#{first_post.id}.json", params: { retort: emoji }
+        delete "/retorts/#{first_post.id}/all.json", params: { retort: emoji }
         expect(response.status).to eq(200)
         sign_in(another_user)
-        post "/retorts/#{first_post.id}.json", params: { retort: emoji }
+        put "/retorts/#{first_post.id}.json", params: { retort: emoji }
         expect(response.status).to eq(403)
         sign_in(user)
-        post "/retorts/#{first_post.id}.json", params: { retort: emoji }
+        put "/retorts/#{first_post.id}.json", params: { retort: emoji }
         expect(response.status).to eq(200)
       end
     end

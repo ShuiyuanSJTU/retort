@@ -467,6 +467,65 @@ export default {
     ],
     tags: null,
   },
+  "put:/retorts/398.json": {
+    id: 398,
+    retorts: [
+      {
+        post_id: 398,
+        usernames: [
+          "User123",
+          "张三123",
+          "ABC_456",
+          "Test_User",
+          "李四_ABC",
+          "DEF456",
+          "pangbo"
+        ],
+        emoji: "pouting_cat"
+      },
+      {
+        post_id: 398,
+        usernames: [
+          "pangbo"
+        ],
+        emoji: "smile"
+      },
+      {
+        post_id: 398,
+        usernames: [
+          "张三123",
+          "ABC_456",
+          "Test_User",
+          "李四_ABC",
+          "DEF456",
+          "somebody",
+          "pangbo"
+        ],
+        emoji: "+1"
+      },
+      {
+        post_id: 398,
+        usernames: [
+          "User123",
+          "张三123",
+          "ABC_456",
+          "NewUser1",
+          "新用户2",
+          "ID_789",
+          "User_XYZ",
+          "新用户3"
+        ],
+        emoji: "ocean"
+      },
+      {
+        post_id: 398,
+        usernames: [
+          "pangbo"
+        ],
+        emoji: "melting_face"
+      }
+    ],
+  },
   "/retort/topics/114514.json": {
     id: 398,
     name: "Uwe Keim",

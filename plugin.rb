@@ -56,8 +56,9 @@ after_initialize do
   end
 
   DiscourseRetort::Engine.routes.draw do
-    post "/:post_id" => "retorts#update"
-    delete "/:post_id" => "retorts#remove"
+    put "/:post_id" => "retorts#create"
+    delete "/:post_id" => "retorts#withdraw"
+    delete "/:post_id/all" => "retorts#remove"
   end
 
   Discourse::Application.routes.append do
