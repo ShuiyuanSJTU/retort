@@ -3,11 +3,11 @@ import hbs from "discourse/widgets/hbs-compiler";
 import { createWidget } from "discourse/widgets/widget";
 import { getOwnerWithFallback } from "discourse-common/lib/get-owner";
 import I18n from "discourse-i18n";
-import Retort from "../lib/retort";
 
 createWidget("retort-remove-emoji", {
   tagName: "a.remove-retort",
   template: hbs`{{d-icon "times"}}`,
+  services: ['retort'],
 
   buildKey: (attrs) => `retort-remove-${attrs.post.id}-${attrs.emoji}`,
 
@@ -21,7 +21,7 @@ createWidget("retort-remove-emoji", {
     dialog.confirm({
       title: I18n.t("retort.confirm_remove.title"),
       message: I18n.t("retort.confirm_remove.message", { emoji }),
-      didConfirm: () => Retort.removeRetort(post, emoji).catch(popupAjaxError),
+      didConfirm: () => this.retort.removeRetort(post, emoji).catch(popupAjaxError),
     });
   },
 });

@@ -1,36 +1,37 @@
-import Object from "@ember/object";
+import Service, { inject as service } from '@ember/service';
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
-import { getOwnerWithFallback } from "discourse-common/lib/get-owner";
 
-export default Object.create({
+export default class Retort extends Service {
+  @service appEvents;
+
   createRetort({ id }, retort) {
     return ajax(`/retorts/${id}.json`, {
       type: "PUT",
       data: { retort },
     });
-  },
+  }
 
   withdrawRetort({ id }, retort) {
     return ajax(`/retorts/${id}.json`, {
       type: "DELETE",
       data: { retort },
     });
-  },
+  }
 
   removeRetort({ id }, retort) {
     return ajax(`/retorts/${id}/all.json`, {
       type: "DELETE",
       data: { retort },
     });
-  },
+  }
 
   disabledCategories() {
-    const siteSettings =
-      getOwnerWithFallback(this).lookup("site-settings:main");
-    const categories = siteSettings.retort_disabled_categories.split("|");
+    // const siteSettings =
+      // getOwnerWithFallback(this).lookup("site-settings:main");
+    const categories = this.siteSettings.retort_disabled_categories.split("|");
     return categories.map((cat) => parseInt(cat, 10)).filter(Boolean);
-  },
+  }
 
   disableShowForTopic(topic) {
     if (!topic) {
@@ -39,7 +40,7 @@ export default Object.create({
     const categoryId = topic.get("category.id");
     const disabledCategories = this.disabledCategories();
     return categoryId && disabledCategories.includes(categoryId);
-  },
+  }
 
   openPicker(post) {
     const retortAnchor = document.querySelector(`
@@ -60,7 +61,7 @@ export default Object.create({
       }
       this.set("picker.isActive", false);
     });
-  },
+  }
 
   setPicker(picker) {
     this.set("picker", picker);
@@ -73,10 +74,11 @@ export default Object.create({
             console.error("Retort post id mismatch");
           } else {
             picker.post.set("retorts", data.retorts);
-            getOwnerWithFallback(this).lookup("service:app-events").trigger("post-stream:refresh", { id: data.id });
+            // getOwnerWithFallback(this).lookup("service:app-events")
+            this.appEvents.trigger("post-stream:refresh", { id: data.id });
           }
         })
         .catch(popupAjaxError)
     );
-  },
-});
+  }
+}

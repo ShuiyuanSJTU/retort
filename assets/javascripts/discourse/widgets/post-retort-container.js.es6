@@ -1,15 +1,15 @@
 import { emojiUrlFor } from "discourse/lib/text";
 import { createWidget } from "discourse/widgets/widget";
-import Retort from "../lib/retort";
 
 createWidget("post-retort-container", {
   tagName: "div.post-retort-container",
+  services: ['retort'],
 
   buildKey: (attrs) => `post-retort-container-${attrs.post.id}`,
 
   html(attrs) {
     const { post } = attrs;
-    if (Retort.disableShowForTopic(post.topic)) {
+    if (this.retort.disableShowForTopic(post.topic)) {
       return;
     }
 

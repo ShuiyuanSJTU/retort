@@ -2,10 +2,10 @@ import { h } from "virtual-dom";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 import { createWidget } from "discourse/widgets/widget";
 import I18n from "discourse-i18n";
-import Retort from "../lib/retort";
 
 export default createWidget("retort-toggle", {
   tagName: "button.post-retort",
+  services: ['retort'],
 
   buildClasses(attrs) {
     const classList = [];
@@ -28,14 +28,14 @@ export default createWidget("retort-toggle", {
     }
     const { post, emoji } = this.attrs;
     if (this.isMyRetort()) {
-      Retort.withdrawRetort(post, emoji)
+      this.retort.withdrawRetort(post, emoji)
         .then((data) => {
           post.set("retorts", data.retorts);
           this.scheduleRerender();
         })
         .catch(popupAjaxError);
     } else {
-      Retort.createRetort(post, emoji)
+      this.retort.createRetort(post, emoji)
         .then((data) => {
           post.set("retorts", data.retorts);
           this.scheduleRerender();

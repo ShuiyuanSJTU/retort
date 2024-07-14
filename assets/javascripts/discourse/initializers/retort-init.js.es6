@@ -1,8 +1,8 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
-import Retort from "../lib/retort";
 
 function initializePlugin(api) {
   const { retort_enabled } = api._lookupContainer("site-settings:main");
+  const Retort = api.container.lookup("service:retort");
 
   if (!retort_enabled) {
     return;
