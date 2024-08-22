@@ -62,3 +62,30 @@ class Retort < ActiveRecord::Base
     Discourse.cache.delete(Retort.cache_key(post_id))
   end
 end
+
+# == Schema Information
+#
+# Table name: retorts
+#
+#  id         :bigint           not null, primary key
+#  emoji      :string
+#  post_id    :integer
+#  user_id    :integer
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  deleted_at :datetime
+#  deleted_by :integer
+#
+# Indexes
+#
+#  index_retorts_on_emoji                          (emoji)
+#  index_retorts_on_post_id                        (post_id)
+#  index_retorts_on_post_id_and_user_id_and_emoji  (post_id,user_id,emoji) UNIQUE
+#  index_retorts_on_user_id                        (user_id)
+#  retorts_post_id_idx                             (post_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (post_id => posts.id)
+#  fk_rails_...  (user_id => users.id)
+#
