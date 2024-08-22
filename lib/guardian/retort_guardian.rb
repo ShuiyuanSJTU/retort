@@ -31,7 +31,7 @@ module DiscourseRetort::RetortGuardian
     return false if retort.nil?
     return false unless is_my_own?(retort)
     return false unless can_create_retort_on_post?(retort.post)
-    return false if @user.id != retort.deleted_by
+    return false if @user.id != retort.deleted_by_id
     true
   end
 

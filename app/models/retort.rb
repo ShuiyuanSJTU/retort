@@ -3,6 +3,8 @@
 require_dependency "rate_limiter"
 
 class Retort < ActiveRecord::Base
+  include Trashable
+
   belongs_to :post
   belongs_to :user
   validates :emoji, presence: true
@@ -10,30 +12,22 @@ class Retort < ActiveRecord::Base
   after_save :clear_cache
   after_destroy :clear_cache
 
-  def deleted?
-    !self.deleted_at.nil?
+  def trash_update(deleted_at, deleted_by_id)
+    # override trash_update to trigger callbacks and set updated_at
+    self.deleted_at = deleted_at
+    self.deleted_by_id = deleted_by_id
+    self.updated_at = deleted_at.present? ? deleted_at : Time.now
+    self.save!
   end
 
   def toggle!
-    self.deleted? ? self.recover! : self.withdraw!
+    self.trashed? ? self.recover! : self.trash!(user)
   end
 
-  def withdraw!
-    self.deleted_at = Time.now
-    self.deleted_by = user.id
-    self.save!
-  end
-
-  def recover!
-    self.deleted_at = nil
-    self.deleted_by = nil
-    self.save!
-  end
-
-  def self.remove_retort(post_id, emoji, actor_id)
-    exist_record = Retort.where(post_id: post_id, emoji: emoji, deleted_at: nil)
+  def self.remove_retort(post_id, emoji, actor)
+    exist_record = Retort.where(post_id: post_id, emoji: emoji)
     if exist_record.present?
-      exist_record.update_all(deleted_at: Time.now, deleted_by: actor_id)
+      exist_record.update_all(deleted_at: Time.now, updated_at: Time.now, deleted_by_id: actor.id)
       Retort.clear_cache(post_id)
       return true
     end

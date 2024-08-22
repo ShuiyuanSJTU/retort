@@ -66,17 +66,17 @@ describe Retort do
     end
 
     it "can withdraw" do
-      expect { retort.withdraw! }.to change { retort.deleted_at }.from(nil).to(
+      expect { retort.trash!(user) }.to change { retort.deleted_at }.from(nil).to(
         be_present
-      ).and change { retort.deleted_by }.from(nil).to(user.id)
+      ).and change { retort.deleted_by }.from(nil).to(user)
     end
 
     it "can recover" do
       original_created_at = retort.created_at
-      retort.withdraw!
+      retort.trash!(user)
       expect { retort.recover! }.to change { retort.deleted_at }.from(
         be_present
-      ).to(nil).and change { retort.deleted_by }.from(user.id).to(nil)
+      ).to(nil).and change { retort.deleted_by }.from(user).to(nil)
       expect(retort.created_at).to eq_time original_created_at
       expect(retort.updated_at).not_to eq_time original_created_at
     end

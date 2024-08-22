@@ -111,9 +111,9 @@ describe DiscourseRetort::RetortsController do
         end
         expect(JSON.parse(response.body)["id"]).to eq first_post.id
         retort =
-          Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
+          Retort.with_deleted.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
         expect(retort.reload.deleted_at).to eq_time time + 1.seconds
-        expect(retort.deleted_by).to eq user.id
+        expect(retort.deleted_by).to eq user
         expect(retort.updated_at).to eq_time time + 1.seconds
         expect(retort.created_at).to eq_time time
       end
@@ -142,7 +142,7 @@ describe DiscourseRetort::RetortsController do
             post_id: first_post.id,
             user_id: user.id,
             emoji: emoji
-          ).withdraw!
+          ).trash!(user)
         end
       end
 
@@ -151,6 +151,7 @@ describe DiscourseRetort::RetortsController do
           sign_in(user)
           put "/retorts/#{first_post.id}.json", params: { retort: emoji }
         end
+        expect(response.status).to eq(200)
         expect(JSON.parse(response.body)["id"]).to eq first_post.id
         retort =
           Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
@@ -165,6 +166,7 @@ describe DiscourseRetort::RetortsController do
           sign_in(user)
           put "/retorts/#{first_post.id}.json", params: { retort: emoji }
         end
+        expect(response.status).to eq(200)
         expect(JSON.parse(response.body)["id"]).to eq first_post.id
         retort =
           Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
@@ -186,10 +188,10 @@ describe DiscourseRetort::RetortsController do
             post_id: first_post.id,
             user_id: user.id,
             emoji: emoji
-          ).withdraw!
+          ).trash!(user)
         end
         travel_to time + 6.seconds do
-          Retort.find_by(
+          Retort.with_deleted.find_by(
             post_id: first_post.id,
             user_id: user.id,
             emoji: emoji
@@ -204,9 +206,9 @@ describe DiscourseRetort::RetortsController do
         end
         expect(JSON.parse(response.body)["id"]).to eq first_post.id
         retort =
-          Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
+          Retort.with_deleted.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
         expect(retort.deleted_at).to eq_time time + 7.seconds
-        expect(retort.deleted_by).to eq user.id
+        expect(retort.deleted_by).to eq user
         expect(retort.updated_at).to eq_time time + 7.seconds
         expect(retort.created_at).to eq_time time
       end
@@ -216,11 +218,12 @@ describe DiscourseRetort::RetortsController do
           sign_in(user)
           delete "/retorts/#{first_post.id}.json", params: { retort: emoji }
         end
+        expect(response.status).to eq(200)
         expect(JSON.parse(response.body)["id"]).to eq first_post.id
         retort =
-          Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
+          Retort.with_deleted.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
         expect(retort.deleted_at).to eq_time time + 12.seconds
-        expect(retort.deleted_by).to eq user.id
+        expect(retort.deleted_by).to eq user
         expect(retort.updated_at).to eq_time time + 12.seconds
         expect(retort.created_at).to eq_time time
       end
@@ -284,7 +287,7 @@ describe DiscourseRetort::RetortsController do
           Retort.find_by(post_id: first_post.id, emoji: emoji, deleted_at: nil)
         ).to be_nil
         expect(
-          Retort.where(post_id: first_post.id, emoji: emoji).pluck(:deleted_by)
+          Retort.where(post_id: first_post.id, emoji: emoji).pluck(:deleted_by_id)
         ).to all eq(staff.id)
       end
 
@@ -293,7 +296,7 @@ describe DiscourseRetort::RetortsController do
           post_id: first_post.id,
           user_id: user.id,
           emoji: emoji
-        ).withdraw!
+        ).trash!(user)
         sign_in(staff)
         delete "/retorts/#{first_post.id}/all.json", params: { retort: emoji }
         expect(response.status).to eq(200)

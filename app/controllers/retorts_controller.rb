@@ -18,9 +18,9 @@ class DiscourseRetort::RetortsController < ::ApplicationController
     end
 
     exist_record =
-      Retort.find_by(post_id: post.id, user_id: current_user.id, emoji: emoji)
+      Retort.with_deleted.find_by(post_id: post.id, user_id: current_user.id, emoji: emoji)
     if exist_record.present?
-      if exist_record.deleted?
+      if exist_record.trashed?
         # Record has been deleted, try to create again
         guardian.ensure_can_recover_retort!(exist_record)
         exist_record.recover!
@@ -53,10 +53,9 @@ class DiscourseRetort::RetortsController < ::ApplicationController
 
     exist_record =
       Retort.find_by(post_id: post.id, user_id: current_user.id, emoji: emoji)
-    if exist_record.present? && !exist_record.deleted?
-      # Record has been deleted, try to create again
+    if exist_record.present?
       guardian.ensure_can_withdraw_retort!(exist_record)
-      exist_record.withdraw!
+      exist_record.trash!(current_user)
       DiscourseEvent.trigger(:withdraw_retort, post, current_user, emoji)
     else
       respond_with_unprocessable(I18n.t("retort.error.not_found"))
@@ -83,16 +82,16 @@ class DiscourseRetort::RetortsController < ::ApplicationController
     end
 
     exist_record =
-      Retort.find_by(post_id: post.id, user_id: current_user.id, emoji: emoji)
+      Retort.with_deleted.find_by(post_id: post.id, user_id: current_user.id, emoji: emoji)
     if exist_record.present?
-      if exist_record.deleted?
+      if exist_record.trashed?
         # Record has been deleted, try to create again
         guardian.ensure_can_recover_retort!(exist_record)
         exist_record.recover!
         DiscourseEvent.trigger(:create_retort, post, current_user, emoji)
       else
         guardian.ensure_can_withdraw_retort!(exist_record)
-        exist_record.withdraw!
+        exist_record.trash!(current_user)
         DiscourseEvent.trigger(:withdraw_retort, post, current_user, emoji)
       end
     else
@@ -122,7 +121,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
     emoji = params[:retort]
     guardian.ensure_can_moderate_retort!(post)
 
-    result = Retort.remove_retort(post.id, emoji, current_user.id)
+    result = Retort.remove_retort(post.id, emoji, current_user)
     if result.present?
       UserHistory.create!(
         acting_user_id: current_user.id,
