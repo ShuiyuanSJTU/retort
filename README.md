@@ -1,45 +1,56 @@
 # Retort - A Reaction Plugin for Discourse
 
-Retort allows you and your users to add slack-style reactions to your discourse posts.
+[English](README.md) | [简体中文](README_zh.md)
 
-Check out a quick gif of it in action [here](http://recordit.co/7vHi2j74Rg.gif)!
+Retort allows you and your users to add Slack-style reactions to Discourse posts.
 
-### Installation
-- Edit your web template and add the project clone url. (https://meta.discourse.org/t/install-a-plugin/19157)
-- Rebuild your web container so that the plugin installs.
+![Retort](screenshots/retort.jpg)
 
-You're done!
+## Installation
 
-### Limiting the possible emoji set
+- Edit your web template and add the project clone url. (Refer to [how to install plugins](https://meta.discourse.org/t/install-plugins-on-a-self-hosted-site/19157))
+- Rebuild your web container to install the plugin.
 
-Some communities will want to limit the possible reactions to just a few, rather than all possible emojis. Retort now supports this!
+## Features
 
-[![limited reactions](screenshots/limited_reactions.png)]()
+* More user-friendly front-end design
+* More efficient database structure
+* More customization options
+* Support for administrators to remove specific emojis
+* Support for displaying usage statistics in site analytics
 
-In order to use a limited emoji set, simply visit `admin/site_settings/category/plugins`, and check the box which says 'Constrain the list of reactions to the list specified below'.
+## Site Customization Settings
 
-[![admin_panel](screenshots/limited_emoji_set.png)]()
+Visit `/admin/site_settings/category/plugins?filter=plugin%3Aretort` to view all the site settings for the Retort plugin.
 
-Then, enter the list of emojis you'd like to support, delimited by the '|' character.
-(So, for example, if you only wanted to support thumbs up / thumbs down reactions, you'd put in `+1|-1`)
+### Disabling Specific Emojis
 
-Feel free to style elements underneath the `.retort-picker` class in `Admin > Customize > HTML/CSS`, if you need further customizations like emoji size, spacing, etc.
+You can disable specific emojis using the `retort disabled emojis` site setting.
 
-### Limiting the number of reactions per post
+### Limiting Emoji Undo Time
 
-There's an additional site setting, 'retort allow multiple reactions', which determines whether users can react to a single post multiple times or not. (It is enabled by default). If you only want users to be able to create one reaction per post (if you're using Retort as a voting system, for example), set this option to false.
+You can limit the time in seconds for users to undo their reactions through the `retort withdraw tolerance` site setting.
 
-### Disabling retort for particular categories
+### Disabling the Plugin in Specific Categories
 
-The 'retort disabled categories' site setting allows disabling particular reacting in particular categories by name. These category names are case-insensitive.
+You can disable this plugin in specific categories through the `retort disabled categories` site setting. For the designated categories, users will not be able to view, add, or remove reactions.
 
-For example, entering `staff|announcements` into this field will disallow all users from reacting to topics in the categories name 'Staff' or 'Announcements'.
+### Limiting the Number of Reactions Per Post
 
-### Contributing
+The site setting `retort allow multiple reactions` determines whether users can react to the same post multiple times. If you want users to only have one reaction per post (e.g., if you are using Retort as a voting system), set this option to false.
 
-Pull requests welcome! To contribute:
-- [Fork it] (../../fork )
-- Create your feature branch (`git checkout -b your-new-feature`)
-- Commit your changes (`git commit -am 'Add some feature`)
-- Push to the branch (`git push origin your-new-feature`)
-- Create a new Pull Request
+## User Personalization Settings
+
+Users can personalize settings through preferences. Personalization options include hiding reactions from ignored users and hiding all reactions.
+
+## Issue Reporting and Contributions
+
+If you encounter any issues while using the plugin or have suggestions for improvement, feel free to submit issues or pull requests on GitHub.
+
+This plugin currently supports English and Simplified Chinese. If you think the translation needs improvement or want to contribute translations for other languages, please submit a pull request.
+
+### License
+
+This repository is a fork of [gdpelican/retort](https://github.com/gdpelican/retort), and the original plugin is released under the MIT license.
+
+This plugin has been refactored and is maintained by @ShuiyuanSJTU, based on the original plugin, and is released under the MIT license. For more details, please refer to the LICENSE file.
