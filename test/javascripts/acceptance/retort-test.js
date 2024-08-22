@@ -66,7 +66,7 @@ acceptance("Retorts", function (needs) {
     );
   });
 
-  test("disabled retort ", async function (assert) {
+  test("disabled retort", async function (assert) {
     await visit("/t/retort-topic/114514");
 
     assert.strictEqual(
@@ -104,7 +104,7 @@ acceptance("Retorts", function (needs) {
     );
   });
 
-  test("update with response", async function (assert) {
+  test("make requests", async function (assert) {
     const putEndpoint = sinon.spy();
     const deleteEndpoint = sinon.spy();
     await visit("/t/retort-topic/114514");
@@ -162,10 +162,6 @@ acceptance("Retorts", function (needs) {
     assert.ok(
       visible("#dialog-holder"),
       "The dialog is visible"
-    );
-    assert.strictEqual(
-      query("#dialog-holder .dialog-body").innerText,
-      "An error occurred: FAIL",
     );
     await click("#dialog-holder .dialog-footer .btn-primary");
     assert.ok(

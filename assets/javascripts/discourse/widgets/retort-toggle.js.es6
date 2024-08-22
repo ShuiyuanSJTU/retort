@@ -31,6 +31,7 @@ export default createWidget("retort-toggle", {
       this.retort.withdrawRetort(post, emoji)
         .then((data) => {
           post.set("retorts", data.retorts);
+          post.set("my_retorts", data.my_retorts);
           this.scheduleRerender();
         })
         .catch(popupAjaxError);
@@ -38,6 +39,7 @@ export default createWidget("retort-toggle", {
       this.retort.createRetort(post, emoji)
         .then((data) => {
           post.set("retorts", data.retorts);
+          post.set("my_retorts", data.my_retorts);
           this.scheduleRerender();
         })
         .catch(popupAjaxError);

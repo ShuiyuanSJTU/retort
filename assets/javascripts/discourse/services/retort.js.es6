@@ -27,8 +27,6 @@ export default class Retort extends Service {
   }
 
   disabledCategories() {
-    // const siteSettings =
-      // getOwnerWithFallback(this).lookup("site-settings:main");
     const categories = this.siteSettings.retort_disabled_categories.split("|");
     return categories.map((cat) => parseInt(cat, 10)).filter(Boolean);
   }
@@ -74,7 +72,7 @@ export default class Retort extends Service {
             console.error("Retort post id mismatch");
           } else {
             picker.post.set("retorts", data.retorts);
-            // getOwnerWithFallback(this).lookup("service:app-events")
+            picker.post.set("my_retorts", data.my_retorts);
             this.appEvents.trigger("post-stream:refresh", { id: data.id });
           }
         })

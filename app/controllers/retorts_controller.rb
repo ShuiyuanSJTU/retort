@@ -43,7 +43,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
       end
     end
     MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}",
-                       serialized_post_retorts
+                       serialized_post_retorts_for_messagebus
     render json: serialized_post_retorts
   end
 
@@ -64,7 +64,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
     end
 
     MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}",
-                       serialized_post_retorts
+                       serialized_post_retorts_for_messagebus
     render json: serialized_post_retorts
   end
 
@@ -113,7 +113,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
     end
 
     MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}",
-                       serialized_post_retorts
+                       serialized_post_retorts_for_messagebus
     render json: serialized_post_retorts
   end
 
@@ -132,7 +132,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
       )
     end
     MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}",
-                       serialized_post_retorts
+                       serialized_post_retorts_for_messagebus
     render json: serialized_post_retorts
   end
 
@@ -148,7 +148,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
     end
   end
 
-  def serialized_post_retorts
+  def serialized_post_retorts_for_messagebus
     {
       id: post.id,
       retorts:
@@ -157,6 +157,19 @@ class DiscourseRetort::RetortsController < ::ApplicationController
           scope: Guardian.new,
           root: false
         ).retorts
+    }
+  end
+
+  def serialized_post_retorts
+    post_serializer = ::PostSerializer.new(
+      post.reload,
+      scope: Guardian.new(current_user),
+      root: false
+    )
+    {
+      id: post.id,
+      retorts: post_serializer.retorts,
+      my_retorts: post_serializer.my_retorts
     }
   end
 
