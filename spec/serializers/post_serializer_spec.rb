@@ -25,8 +25,7 @@ RSpec.describe PostSerializer do
     end
 
     it "should use cache" do
-      Discourse.cache.expects(:fetch).twice
-      post_serializer = PostSerializer.new(post, scope: Guardian.new).as_json
+      PostSerializer.new(post, scope: Guardian.new).as_json
       Retort.expects(:where).never
       PostSerializer.new(post, scope: Guardian.new).as_json
     end
