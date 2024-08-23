@@ -12,10 +12,9 @@ module DiscourseRetort
         .cache
         .fetch(Retort.cache_key(object.id), expires_in: 5.minute) do
           retort_groups =
-            Retort
-              .where(post_id: object.id, deleted_at: nil)
-              .includes(:user)
-              .order("created_at")
+            object.retorts
+              .to_a
+              .sort_by { |r| r.updated_at }
               .group_by { |r| r.emoji }
           result = []
           retort_groups.each do |emoji, group|
@@ -30,10 +29,9 @@ module DiscourseRetort
 
     def my_retorts
       return [] unless scope.user
-      Retort
-        .where(post_id: object.id, user_id: scope.user.id, deleted_at: nil)
-        .select(:emoji, :updated_at)
-        .map { |result| result.attributes.compact }
+      object.retorts
+        .filter { |r| r.user_id == scope.user.id }
+        .map { |r| {emoji: r.emoji, updated_at: r.updated_at} }
     end
 
     def can_retort

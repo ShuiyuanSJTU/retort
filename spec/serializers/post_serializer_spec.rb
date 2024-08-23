@@ -36,11 +36,11 @@ RSpec.describe PostSerializer do
       post_serializer =
         PostSerializer.new(post, scope: Guardian.new(user1)).as_json[:post]
       expect(post_serializer[:my_retorts].length).to eq(2)
-      expect(post_serializer[:my_retorts].pluck("emoji")).to match_array(
+      expect(post_serializer[:my_retorts].pluck(:emoji)).to match_array(
         %w[heart +1]
       )
       expect(
-        post_serializer[:my_retorts].pluck("updated_at").compact.length
+        post_serializer[:my_retorts].pluck(:updated_at).compact.length
       ).to eq(2)
     end
 

@@ -94,4 +94,13 @@ after_initialize do
       end
     end
   end
+
+  module DiscourseRetort::OverrideTopicView
+    def initialize(topic_or_topic_id, user = nil, options = {})
+      super
+      @posts = @posts.includes(:retorts).includes(retorts: :user)
+    end
+  end
+
+  TopicView.prepend(DiscourseRetort::OverrideTopicView)
 end
