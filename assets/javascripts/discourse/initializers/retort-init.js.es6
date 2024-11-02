@@ -42,8 +42,10 @@ function initializePlugin(api) {
     onRetortUpdate(data) {
       const { id, retorts } = data;
       const post = this.get("model.postStream.posts").findBy("id", id);
-      post.setProperties({ retorts });
-      this.appEvents.trigger("post-stream:refresh", { id: post.get("id") });
+      if (post) {
+        post.setProperties({ retorts });
+        this.appEvents.trigger("post-stream:refresh", { id: post.get("id") });
+      }
     },
 
     subscribe() {
