@@ -40,7 +40,7 @@ after_initialize do
   require_relative "lib/override_post_serializer.rb"
   ::PostSerializer.prepend DiscourseRetort::OverridePostSerializer
 
-  register_stat("retort", show_in_ui: true, expose_via_api: true) do
+  register_stat("retort", expose_via_api: true) do
     {
       :last_day => Retort.where("created_at > ?", 1.days.ago).count,
       "7_days" => Retort.where("created_at > ?", 7.days.ago).count,
