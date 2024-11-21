@@ -1,12 +1,7 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
+import { getOwnerWithFallback } from "discourse-common/lib/get-owner";
 
 function initializePlugin(api) {
-  const { retort_enabled } = api._lookupContainer("site-settings:main");
-  const Retort = api.container.lookup("service:retort");
-
-  if (!retort_enabled) {
-    return;
-  }
   const currentUser = api.getCurrentUser();
 
   api.modifyClass("controller:preferences/notifications", {
@@ -31,6 +26,7 @@ function initializePlugin(api) {
   });
 
   api.addPostClassesCallback((attrs) => {
+    const Retort = getOwnerWithFallback(api).lookup("service:retort");
     if (!Retort.disableShowForTopic(attrs.topic)) {
       return ["retort"];
     }
@@ -77,6 +73,7 @@ function initializePlugin(api) {
   });
 
   api.attachWidgetAction("post-menu", "clickRetort", function () {
+    const Retort = getOwnerWithFallback(api).lookup("service:retort");
     const post = this.findAncestorModel();
     Retort.openPicker(post);
   });
@@ -84,7 +81,10 @@ function initializePlugin(api) {
 
 export default {
   name: "retort",
-  initialize: function () {
-    withPluginApi("0.8.6", (api) => initializePlugin(api));
+  initialize: function (container) {
+    if (!container.lookup("service:site-settings").retort_enabled) {
+      return;
+    }
+    withPluginApi("1.3", (api) => initializePlugin(api));
   },
 };
