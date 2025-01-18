@@ -1,5 +1,6 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 import { getOwnerWithFallback } from "discourse-common/lib/get-owner";
+import RetortButton from "../components/retort-button";
 
 function initializePlugin(api) {
   const currentUser = api.getCurrentUser();
@@ -59,24 +60,23 @@ function initializePlugin(api) {
     }
   });
 
-  api.addPostMenuButton("retort", ({ can_retort }) => {
-    if (!can_retort) {
-      return;
+  api.registerValueTransformer(
+    "post-menu-buttons",
+    ({
+      value: dag, 
+      context: {
+        firstButtonKey,
+      },
+    }) => {
+        dag.add(
+          "retort",
+          RetortButton,
+          {
+            before: firstButtonKey,
+          }
+        );
     }
-    return {
-      action: "clickRetort",
-      icon: "far-smile",
-      title: "retort.title",
-      position: "first",
-      className: "retort",
-    };
-  });
-
-  api.attachWidgetAction("post-menu", "clickRetort", function () {
-    const Retort = getOwnerWithFallback(api).lookup("service:retort");
-    const post = this.findAncestorModel();
-    Retort.openPicker(post);
-  });
+  );
 }
 
 export default {

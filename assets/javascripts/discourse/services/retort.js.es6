@@ -1,4 +1,4 @@
-import Service, { inject as service } from '@ember/service';
+import Service, { service } from '@ember/service';
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 
@@ -38,45 +38,5 @@ export default class Retort extends Service {
     const categoryId = topic.get("category.id");
     const disabledCategories = this.disabledCategories();
     return categoryId && disabledCategories.includes(categoryId);
-  }
-
-  openPicker(post) {
-    const retortAnchor = document.querySelector(`
-          article[data-post-id="${post.id}"] .post-controls .retort`);
-    if (retortAnchor) {
-      retortAnchor.classList.add("emoji-picker-anchor");
-    }
-
-    this.set("picker.isActive", true);
-    this.set("picker.post", post);
-    // eslint-disable-next-line no-unused-vars
-    this.set("picker.onEmojiPickerClose", (event) => {
-      const currentRetortAnchor = document.querySelector(
-        ".emoji-picker-anchor.retort"
-      );
-      if (currentRetortAnchor) {
-        currentRetortAnchor.classList.remove("emoji-picker-anchor");
-      }
-      this.set("picker.isActive", false);
-    });
-  }
-
-  setPicker(picker) {
-    this.set("picker", picker);
-    this.set("picker.emojiSelected", (emoji) =>
-      this.createRetort(picker.post, emoji)
-        .then((data) => {
-          picker.set("isActive", false);
-          if (data.id !== picker.post.id) {
-            // eslint-disable-next-line no-console
-            console.error("Retort post id mismatch");
-          } else {
-            picker.post.set("retorts", data.retorts);
-            picker.post.set("my_retorts", data.my_retorts);
-            this.appEvents.trigger("post-stream:refresh", { id: data.id });
-          }
-        })
-        .catch(popupAjaxError)
-    );
   }
 }

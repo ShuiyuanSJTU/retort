@@ -6,7 +6,7 @@ import I18n from "discourse-i18n";
 
 createWidget("retort-remove-emoji", {
   tagName: "a.remove-retort",
-  template: hbs`{{d-icon "times"}}`,
+  template: hbs`{{d-icon "xmark"}}`,
   services: ['retort'],
 
   buildKey: (attrs) => `retort-remove-${attrs.post.id}-${attrs.emoji}`,
