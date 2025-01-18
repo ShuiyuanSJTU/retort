@@ -2,7 +2,7 @@
 
 # name: retort
 # about: Reactions plugin for Discourse
-# version: 1.3.9
+# version: 1.4.0
 # authors: Jiajun Du, pangbo. original: James Kiesel (gdpelican)
 # url: https://github.com/ShuiyuanSJTU/retort
 
