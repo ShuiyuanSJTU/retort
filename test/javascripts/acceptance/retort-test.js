@@ -79,19 +79,13 @@ acceptance("Retorts", function (needs) {
       2,
       "There are 2 retorts from the current user"
     );
-    assert.ok(
-      !visible("#post_2 .actions button.retort"),
-      "The retort button is not visible"
-    );
+    assert.notOk(visible("#post_2 .actions button.retort"), "The retort button is not visible");
     assert.strictEqual(
       count("#post_2 .post-retort-container button.post-retort.disabled img"),
       3,
       "The retort button is disabled"
     );
-    assert.ok(
-      !exists("#post_2 .post-retort-container button.post-retort:not(.disabled) img"),
-      "No retort button is enabled"
-    );
+    assert.notOk(exists("#post_2 .post-retort-container button.post-retort:not(.disabled) img"), "No retort button is enabled");
   });
 
   test("can remove retort", async function (assert) {
@@ -122,36 +116,22 @@ acceptance("Retorts", function (needs) {
       return response(200);
     });
     await click("#post_1 .post-retort-container button.post-retort:not(.disabled)");
-    assert.strictEqual(
-      deleteEndpoint.calledOnce,
-      true,
-      "requested once for withdraw"
-    );
-    assert.strictEqual(
-      putEndpoint.notCalled,
-      true,
-      "no request for create"
-    );
+    assert.true(deleteEndpoint.calledOnce, "requested once for withdraw");
+    assert.true(putEndpoint.notCalled, "no request for create");
   });
 
   test("pop selector", async function (assert) {
     await visit("/t/retort-topic/114514");
-    assert.ok(
-      !visible(".emoji-picker"),
-      "The emoji picker is not visible"
-    );
+    assert.notOk(visible(".emoji-picker"), "The emoji picker is not visible");
     await click("#post_1 .actions button.retort");
     assert.ok(
       visible(".emoji-picker"),
       "The emoji picker is visible"
     );
-    await click(".emoji-picker .section-group img[title='melting_face']");
+    await click(".emoji-picker__section-emojis img[title=':grinning:']");
+    assert.notOk(visible(".emoji-picker"), "The emoji picker is not visible");
     assert.ok(
-      !visible(".emoji-picker"),
-      "The emoji picker is not visible"
-    );
-    assert.ok(
-      visible("#post_1 button.post-retort:has(img[alt=':melting_face:'])"),
+      visible("#post_1 button.post-retort:has(img[alt=':grinning:'])"),
       "New retort is visible"
     );
   });
@@ -164,10 +144,7 @@ acceptance("Retorts", function (needs) {
       "The dialog is visible"
     );
     await click("#dialog-holder .dialog-footer .btn-primary");
-    assert.ok(
-      !visible("#dialog-holder"),
-      "The dialog is not visible"
-    );
+    assert.notOk(visible("#dialog-holder"), "The dialog is not visible");
   });
 
   test("message bus", async function (assert) {

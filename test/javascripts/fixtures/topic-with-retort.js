@@ -522,7 +522,7 @@ export default {
         usernames: [
           "pangbo"
         ],
-        emoji: "melting_face"
+        emoji: "grinning"
       }
     ],
   },
