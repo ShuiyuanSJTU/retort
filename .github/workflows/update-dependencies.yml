@@ -1,0 +1,12 @@
+name: Update dependencies and configuration files
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update_files:
+    uses: ShuiyuanSJTU/.github/.github/workflows/update-dependencies.yml@main
