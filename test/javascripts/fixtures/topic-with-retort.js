@@ -64,16 +64,14 @@ export default {
                 "Test_User",
                 "李四_ABC",
                 "DEF456",
-                "pangbo"
+                "pangbo",
               ],
-              emoji: "pouting_cat"
+              emoji: "pouting_cat",
             },
             {
               post_id: 398,
-              usernames: [
-                "pangbo"
-              ],
-              emoji: "smile"
+              usernames: ["pangbo"],
+              emoji: "smile",
             },
             {
               post_id: 398,
@@ -84,9 +82,9 @@ export default {
                 "李四_ABC",
                 "DEF456",
                 "somebody",
-                "pangbo"
+                "pangbo",
               ],
-              emoji: "+1"
+              emoji: "+1",
             },
             {
               post_id: 398,
@@ -98,10 +96,10 @@ export default {
                 "新用户2",
                 "ID_789",
                 "User_XYZ",
-                "新用户3"
+                "新用户3",
               ],
-              emoji: "ocean"
-            }
+              emoji: "ocean",
+            },
           ],
           my_retorts: [
             {
@@ -115,7 +113,7 @@ export default {
             {
               emoji: "smile",
               updated_at: new Date().toISOString(),
-            }
+            },
           ],
           can_retort: true,
           can_remove_retort: false,
@@ -180,9 +178,9 @@ export default {
                 "Test_User",
                 "李四_ABC",
                 "DEF456",
-                "pangbo"
+                "pangbo",
               ],
-              emoji: "pouting_cat"
+              emoji: "pouting_cat",
             },
             {
               post_id: 421,
@@ -193,9 +191,9 @@ export default {
                 "李四_ABC",
                 "DEF456",
                 "somebody",
-                "pangbo"
+                "pangbo",
               ],
-              emoji: "+1"
+              emoji: "+1",
             },
             {
               post_id: 421,
@@ -207,10 +205,10 @@ export default {
                 "新用户2",
                 "ID_789",
                 "User_XYZ",
-                "新用户3"
+                "新用户3",
               ],
-              emoji: "ocean"
-            }
+              emoji: "ocean",
+            },
           ],
           my_retorts: [
             {
@@ -220,7 +218,7 @@ export default {
             {
               emoji: "+1",
               updated_at: new Date().toISOString(),
-            }
+            },
           ],
           can_retort: false,
           can_remove_retort: false,
@@ -285,9 +283,9 @@ export default {
                 "Test_User",
                 "李四_ABC",
                 "DEF456",
-                "pangbo"
+                "pangbo",
               ],
-              emoji: "pouting_cat"
+              emoji: "pouting_cat",
             },
             {
               post_id: 156,
@@ -298,9 +296,9 @@ export default {
                 "李四_ABC",
                 "DEF456",
                 "somebody",
-                "pangbo"
+                "pangbo",
               ],
-              emoji: "+1"
+              emoji: "+1",
             },
             {
               post_id: 156,
@@ -312,10 +310,10 @@ export default {
                 "新用户2",
                 "ID_789",
                 "User_XYZ",
-                "新用户3"
+                "新用户3",
               ],
-              emoji: "ocean"
-            }
+              emoji: "ocean",
+            },
           ],
           my_retorts: [
             {
@@ -325,7 +323,7 @@ export default {
             {
               emoji: "+1",
               updated_at: new Date().toISOString(),
-            }
+            },
           ],
           can_retort: true,
           can_remove_retort: true,
@@ -479,16 +477,14 @@ export default {
           "Test_User",
           "李四_ABC",
           "DEF456",
-          "pangbo"
+          "pangbo",
         ],
-        emoji: "pouting_cat"
+        emoji: "pouting_cat",
       },
       {
         post_id: 398,
-        usernames: [
-          "pangbo"
-        ],
-        emoji: "smile"
+        usernames: ["pangbo"],
+        emoji: "smile",
       },
       {
         post_id: 398,
@@ -499,9 +495,9 @@ export default {
           "李四_ABC",
           "DEF456",
           "somebody",
-          "pangbo"
+          "pangbo",
         ],
-        emoji: "+1"
+        emoji: "+1",
       },
       {
         post_id: 398,
@@ -513,17 +509,15 @@ export default {
           "新用户2",
           "ID_789",
           "User_XYZ",
-          "新用户3"
+          "新用户3",
         ],
-        emoji: "ocean"
+        emoji: "ocean",
       },
       {
         post_id: 398,
-        usernames: [
-          "pangbo"
-        ],
-        emoji: "grinning"
-      }
+        usernames: ["pangbo"],
+        emoji: "grinning",
+      },
     ],
   },
   "/retort/topics/114514.json": {
@@ -587,17 +581,14 @@ export default {
           "Test_User",
           "李四_ABC",
           "DEF456",
-          "pangbo"
+          "pangbo",
         ],
-        emoji: "pouting_cat"
+        emoji: "pouting_cat",
       },
       {
         post_id: 398,
-        usernames: [
-          "pangbo",
-          "DEF456"
-        ],
-        emoji: "smile"
+        usernames: ["pangbo", "DEF456"],
+        emoji: "smile",
       },
       {
         post_id: 398,
@@ -608,9 +599,9 @@ export default {
           "李四_ABC",
           "DEF456",
           "somebody",
-          "pangbo"
+          "pangbo",
         ],
-        emoji: "+1"
+        emoji: "+1",
       },
       {
         post_id: 398,
@@ -622,18 +613,15 @@ export default {
           "新用户2",
           "ID_789",
           "User_XYZ",
-          "新用户3"
+          "新用户3",
         ],
-        emoji: "ocean"
+        emoji: "ocean",
       },
       {
         post_id: 398,
-        usernames: [
-          "User123",
-          "张三123",
-        ],
-        emoji: "innocent"
-      }
+        usernames: ["User123", "张三123"],
+        emoji: "innocent",
+      },
     ],
     my_retorts: [
       {
@@ -647,7 +635,7 @@ export default {
       {
         emoji: "ocean",
         updated_at: "2021-06-08T21:59:16.444Z",
-      }
+      },
     ],
     can_retort: true,
     can_remove_retort: false,

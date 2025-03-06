@@ -14,7 +14,7 @@ enabled_site_setting :retort_enabled
 
 after_initialize do
   module ::DiscourseRetort
-    PLUGIN_NAME ||= "retort".freeze
+    PLUGIN_NAME = "retort".freeze
 
     class Engine < ::Rails::Engine
       engine_name PLUGIN_NAME
@@ -46,12 +46,8 @@ after_initialize do
       "7_days" => Retort.where("created_at > ?", 7.days.ago).count,
       "30_days" => Retort.where("created_at > ?", 30.days.ago).count,
       :previous_30_days =>
-        Retort.where(
-          "created_at BETWEEN ? AND ?",
-          60.days.ago,
-          30.days.ago
-        ).count,
-      :count => Retort.count
+        Retort.where("created_at BETWEEN ? AND ?", 60.days.ago, 30.days.ago).count,
+      :count => Retort.count,
     }
   end
 
@@ -61,9 +57,7 @@ after_initialize do
     delete "/:post_id/all" => "retorts#remove"
   end
 
-  Discourse::Application.routes.append do
-    mount ::DiscourseRetort::Engine, at: "/retorts"
-  end
+  Discourse::Application.routes.append { mount ::DiscourseRetort::Engine, at: "/retorts" }
 
   module DiscourseRetort::OverrideUser
     def self.included(klass)
@@ -88,7 +82,7 @@ after_initialize do
       disabled_emojis = SiteSetting.retort_chat_disabled_emojis.split("|")
       if disabled_emojis.include?(params[:emoji])
         render json: {
-                 error: I18n.t("retort.error.disabled_emojis")
+                 error: I18n.t("retort.error.disabled_emojis"),
                },
                status: :unprocessable_entity
       end

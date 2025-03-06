@@ -1,6 +1,5 @@
-import Service, { service } from '@ember/service';
+import Service, { service } from "@ember/service";
 import { ajax } from "discourse/lib/ajax";
-import { popupAjaxError } from "discourse/lib/ajax-error";
 
 export default class Retort extends Service {
   @service appEvents;

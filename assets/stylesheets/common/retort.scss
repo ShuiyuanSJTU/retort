@@ -2,6 +2,7 @@
   background-color: var(--tertiary-very-low);
   border: 1px solid var(--tertiary-medium);
   transition: 0.2s;
+
   &:hover {
     background-color: var(--tertiary-low);
   }
@@ -11,6 +12,7 @@
   background-color: transparent;
   border: 1px solid var(--primary-low);
   transition: 0.2s;
+
   &:hover {
     background-color: var(--primary-very-low);
   }
@@ -74,7 +76,7 @@
 
   .remove-retort {
     color: var(--primary-medium);
-    padding: 0px;
+    padding: 0;
     margin-left: 4px;
     display: none;
     transition: 0.2s;

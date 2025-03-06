@@ -29,15 +29,8 @@ class DiscourseRetort::RetortsController < ::ApplicationController
     else
       guardian.ensure_can_create!(Retort, post)
       begin
-        exist_record =
-          Retort.create(
-            post_id: post.id,
-            user_id: current_user.id,
-            emoji: emoji
-          )
-        unless exist_record.nil?
-          DiscourseEvent.trigger(:create_retort, post, current_user, emoji)
-        end
+        exist_record = Retort.create(post_id: post.id, user_id: current_user.id, emoji: emoji)
+        DiscourseEvent.trigger(:create_retort, post, current_user, emoji) unless exist_record.nil?
       rescue ActiveRecord::RecordNotUnique
         # Concurrent creation, ignore
       end
@@ -51,8 +44,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
     params.require(:retort)
     emoji = params[:retort]
 
-    exist_record =
-      Retort.find_by(post_id: post.id, user_id: current_user.id, emoji: emoji)
+    exist_record = Retort.find_by(post_id: post.id, user_id: current_user.id, emoji: emoji)
     if exist_record.present?
       guardian.ensure_can_withdraw_retort!(exist_record)
       exist_record.trash!(current_user)
@@ -97,15 +89,8 @@ class DiscourseRetort::RetortsController < ::ApplicationController
     else
       guardian.ensure_can_create!(Retort, post)
       begin
-        exist_record =
-          Retort.create(
-            post_id: post.id,
-            user_id: current_user.id,
-            emoji: emoji
-          )
-        unless exist_record.nil?
-          DiscourseEvent.trigger(:create_retort, post, current_user, emoji)
-        end
+        exist_record = Retort.create(post_id: post.id, user_id: current_user.id, emoji: emoji)
+        DiscourseEvent.trigger(:create_retort, post, current_user, emoji) unless exist_record.nil?
       rescue ActiveRecord::RecordNotUnique
         # Concurrent creation, ignore
       end
@@ -127,7 +112,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
         acting_user_id: current_user.id,
         action: UserHistory.actions[:post_edit],
         post_id: post.id,
-        details: I18n.t("retort.log.remove", emoji: emoji)
+        details: I18n.t("retort.log.remove", emoji: emoji),
       )
     end
     MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}",
@@ -150,26 +135,14 @@ class DiscourseRetort::RetortsController < ::ApplicationController
   def serialized_post_retorts_for_messagebus
     {
       id: post.id,
-      retorts:
-        ::PostSerializer.new(
-          post.reload,
-          scope: Guardian.new,
-          root: false
-        ).retorts
+      retorts: ::PostSerializer.new(post.reload, scope: Guardian.new, root: false).retorts,
     }
   end
 
   def serialized_post_retorts
-    post_serializer = ::PostSerializer.new(
-      post.reload,
-      scope: Guardian.new(current_user),
-      root: false
-    )
-    {
-      id: post.id,
-      retorts: post_serializer.retorts,
-      my_retorts: post_serializer.my_retorts
-    }
+    post_serializer =
+      ::PostSerializer.new(post.reload, scope: Guardian.new(current_user), root: false)
+    { id: post.id, retorts: post_serializer.retorts, my_retorts: post_serializer.my_retorts }
   end
 
   def respond_with_unprocessable(error)

@@ -1,7 +1,7 @@
 import { click, visit } from "@ember/test-helpers";
 import { test } from "qunit";
 import sinon from "sinon";
-import pretender, {response} from "discourse/tests/helpers/create-pretender";
+import pretender, { response } from "discourse/tests/helpers/create-pretender";
 import {
   acceptance,
   count,
@@ -17,24 +17,19 @@ acceptance("Retorts", function (needs) {
   needs.settings({ retort_withdraw_tolerance: 3600 });
 
   needs.pretender((server, helper) => {
-
     server.get("/t/114514.json", () => {
-      return helper.response(
-        retortFixtures["/t/114514.json"]
-      );
+      return helper.response(retortFixtures["/t/114514.json"]);
     });
 
     server.put("/retorts/398.json", () => {
-      return helper.response(
-        retortFixtures["put:/retorts/398.json"]
-      );
+      return helper.response(retortFixtures["put:/retorts/398.json"]);
     });
 
-    server.put("/retorts/421.json", () => helper.response(403, {
-      "errors": [
-        "FAIL"
-      ],
-    }));
+    server.put("/retorts/421.json", () =>
+      helper.response(403, {
+        errors: ["FAIL"],
+      })
+    );
   });
 
   test("show retort", async function (assert) {
@@ -55,12 +50,16 @@ acceptance("Retorts", function (needs) {
       "The retort button is visible"
     );
     assert.strictEqual(
-      query("#post_1 .post-retort-container button.post-retort.my-retort.disabled img").getAttribute('alt'),
+      query(
+        "#post_1 .post-retort-container button.post-retort.my-retort.disabled img"
+      ).getAttribute("alt"),
       ":pouting_cat:",
       "The retort button is disabled"
     );
     assert.strictEqual(
-      query("#post_1 .post-retort-container button.post-retort.my-retort:not(.disabled) img").getAttribute('alt'),
+      query(
+        "#post_1 .post-retort-container button.post-retort.my-retort:not(.disabled) img"
+      ).getAttribute("alt"),
       ":+1:",
       "The retort button is enabled"
     );
@@ -79,13 +78,21 @@ acceptance("Retorts", function (needs) {
       2,
       "There are 2 retorts from the current user"
     );
-    assert.notOk(visible("#post_2 .actions button.retort"), "The retort button is not visible");
+    assert.notOk(
+      visible("#post_2 .actions button.retort"),
+      "The retort button is not visible"
+    );
     assert.strictEqual(
       count("#post_2 .post-retort-container button.post-retort.disabled img"),
       3,
       "The retort button is disabled"
     );
-    assert.notOk(exists("#post_2 .post-retort-container button.post-retort:not(.disabled) img"), "No retort button is enabled");
+    assert.notOk(
+      exists(
+        "#post_2 .post-retort-container button.post-retort:not(.disabled) img"
+      ),
+      "No retort button is enabled"
+    );
   });
 
   test("can remove retort", async function (assert) {
@@ -115,7 +122,9 @@ acceptance("Retorts", function (needs) {
       deleteEndpoint();
       return response(200);
     });
-    await click("#post_1 .post-retort-container button.post-retort:not(.disabled)");
+    await click(
+      "#post_1 .post-retort-container button.post-retort:not(.disabled)"
+    );
     assert.true(deleteEndpoint.calledOnce, "requested once for withdraw");
     assert.true(putEndpoint.notCalled, "no request for create");
   });
@@ -124,10 +133,7 @@ acceptance("Retorts", function (needs) {
     await visit("/t/retort-topic/114514");
     assert.notOk(visible(".emoji-picker"), "The emoji picker is not visible");
     await click("#post_1 .actions button.retort");
-    assert.ok(
-      visible(".emoji-picker"),
-      "The emoji picker is visible"
-    );
+    assert.ok(visible(".emoji-picker"), "The emoji picker is visible");
     await click(".emoji-picker__section-emojis img[title=':grinning:']");
     assert.notOk(visible(".emoji-picker"), "The emoji picker is not visible");
     assert.ok(
@@ -139,34 +145,43 @@ acceptance("Retorts", function (needs) {
   test("pop ajax error", async function (assert) {
     await visit("/t/retort-topic/114514");
     await click("#post_3 .not-my-retort");
-    assert.ok(
-      visible("#dialog-holder"),
-      "The dialog is visible"
-    );
+    assert.ok(visible("#dialog-holder"), "The dialog is visible");
     await click("#dialog-holder .dialog-footer .btn-primary");
     assert.notOk(visible("#dialog-holder"), "The dialog is not visible");
   });
 
   test("message bus", async function (assert) {
     await visit("/t/retort-topic/114514");
-    await publishToMessageBus("/retort/topics/114514",
-      retortFixtures["/retort/topics/114514.json"]);
+    await publishToMessageBus(
+      "/retort/topics/114514",
+      retortFixtures["/retort/topics/114514.json"]
+    );
     assert.ok(
-      visible("#post_1 .post-retort-container button.post-retort:has(img[alt=':innocent:'])"),
+      visible(
+        "#post_1 .post-retort-container button.post-retort:has(img[alt=':innocent:'])"
+      )
     );
     assert.strictEqual(
-      query("#post_1 .post-retort-container button.post-retort:has(img[alt=':+1:']) .post-retort__count").innerText,
-      "7",
+      query(
+        "#post_1 .post-retort-container button.post-retort:has(img[alt=':+1:']) .post-retort__count"
+      ).innerText,
+      "7"
     );
     assert.strictEqual(
-      query("#post_1 .post-retort-container button.post-retort:has(img[alt=':smile:']) .post-retort__count").innerText,
-      "2",
+      query(
+        "#post_1 .post-retort-container button.post-retort:has(img[alt=':smile:']) .post-retort__count"
+      ).innerText,
+      "2"
     );
     assert.ok(
-      visible("#post_1 .post-retort-container button.post-retort.not-my-retort img[alt=':ocean:']"),
+      visible(
+        "#post_1 .post-retort-container button.post-retort.not-my-retort img[alt=':ocean:']"
+      )
     );
     assert.ok(
-      visible("#post_1 .post-retort-container button.post-retort.my-retort img[alt=':+1:']"),
+      visible(
+        "#post_1 .post-retort-container button.post-retort.my-retort img[alt=':+1:']"
+      )
     );
   });
 });

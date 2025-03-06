@@ -1,13 +1,13 @@
 import { popupAjaxError } from "discourse/lib/ajax-error";
+import { getOwnerWithFallback } from "discourse/lib/get-owner";
 import hbs from "discourse/widgets/hbs-compiler";
 import { createWidget } from "discourse/widgets/widget";
-import { getOwnerWithFallback } from "discourse-common/lib/get-owner";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 
 createWidget("retort-remove-emoji", {
   tagName: "a.remove-retort",
   template: hbs`{{d-icon "xmark"}}`,
-  services: ['retort'],
+  services: ["retort"],
 
   buildKey: (attrs) => `retort-remove-${attrs.post.id}-${attrs.emoji}`,
 
@@ -19,9 +19,10 @@ createWidget("retort-remove-emoji", {
     const { post, emoji } = this.state;
     const dialog = getOwnerWithFallback(this).lookup("service:dialog");
     dialog.confirm({
-      title: I18n.t("retort.confirm_remove.title"),
-      message: I18n.t("retort.confirm_remove.message", { emoji }),
-      didConfirm: () => this.retort.removeRetort(post, emoji).catch(popupAjaxError),
+      title: i18n("retort.confirm_remove.title"),
+      message: i18n("retort.confirm_remove.message", { emoji }),
+      didConfirm: () =>
+        this.retort.removeRetort(post, emoji).catch(popupAjaxError),
     });
   },
 });

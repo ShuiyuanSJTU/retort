@@ -37,12 +37,7 @@ describe DiscourseRetort::RetortsController do
           put "/retorts/#{first_post.id}.json", params: { retort: "heart" }
         end
         expect(JSON.parse(response.body)["id"]).to eq first_post.id
-        new_retort =
-          Retort.find_by(
-            post_id: first_post.id,
-            user_id: user.id,
-            emoji: "heart"
-          )
+        new_retort = Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: "heart")
         expect(new_retort).not_to be_nil
         expect(new_retort.created_at).to eq_time time
         expect(new_retort.updated_at).to eq_time time
@@ -59,23 +54,17 @@ describe DiscourseRetort::RetortsController do
         sign_in(user)
         put "/retorts/#{first_post.id}.json", params: { retort: "+1" }
         expect(response.status).to eq(422)
-        expect(JSON.parse(response.body)["error"]).to eq I18n.t(
-             "retort.error.disabled_emojis"
-           )
+        expect(JSON.parse(response.body)["error"]).to eq I18n.t("retort.error.disabled_emojis")
         put "/retorts/#{first_post.id}.json", params: { retort: "laughing" }
         expect(response.status).to eq(422)
-        expect(JSON.parse(response.body)["error"]).to eq I18n.t(
-             "retort.error.disabled_emojis"
-           )
+        expect(JSON.parse(response.body)["error"]).to eq I18n.t("retort.error.disabled_emojis")
       end
 
       it "can not create invalid emoji" do
         sign_in(user)
         put "/retorts/#{first_post.id}.json", params: { retort: "invalid__" }
         expect(response.status).to eq(422)
-        expect(JSON.parse(response.body)["error"]).to eq I18n.t(
-             "retort.error.missing_emoji"
-           )
+        expect(JSON.parse(response.body)["error"]).to eq I18n.t("retort.error.missing_emoji")
       end
 
       it "can not create on archived post" do
@@ -110,8 +99,7 @@ describe DiscourseRetort::RetortsController do
           delete "/retorts/#{first_post.id}.json", params: { retort: emoji }
         end
         expect(JSON.parse(response.body)["id"]).to eq first_post.id
-        retort =
-          Retort.with_deleted.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
+        retort = Retort.with_deleted.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
         expect(retort.reload.deleted_at).to eq_time time + 1.seconds
         expect(retort.deleted_by).to eq user
         expect(retort.updated_at).to eq_time time + 1.seconds
@@ -124,8 +112,7 @@ describe DiscourseRetort::RetortsController do
           delete "/retorts/#{first_post.id}.json", params: { retort: emoji }
         end
         expect(response.status).to eq(403)
-        retort =
-          Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
+        retort = Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
         expect(retort.deleted_at).to be_nil
         expect(retort.deleted_by).to be_nil
       end
@@ -138,11 +125,7 @@ describe DiscourseRetort::RetortsController do
       before(:example) do
         SiteSetting.retort_withdraw_tolerance = 10
         travel_to time do
-          Retort.create(
-            post_id: first_post.id,
-            user_id: user.id,
-            emoji: emoji
-          ).trash!(user)
+          Retort.create(post_id: first_post.id, user_id: user.id, emoji: emoji).trash!(user)
         end
       end
 
@@ -153,8 +136,7 @@ describe DiscourseRetort::RetortsController do
         end
         expect(response.status).to eq(200)
         expect(JSON.parse(response.body)["id"]).to eq first_post.id
-        retort =
-          Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
+        retort = Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
         expect(retort.deleted_at).to be_nil
         expect(retort.deleted_by).to be_nil
         expect(retort.updated_at).to eq_time time + 1.seconds
@@ -168,8 +150,7 @@ describe DiscourseRetort::RetortsController do
         end
         expect(response.status).to eq(200)
         expect(JSON.parse(response.body)["id"]).to eq first_post.id
-        retort =
-          Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
+        retort = Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
         expect(retort.deleted_at).to be_nil
         expect(retort.deleted_by).to be_nil
         expect(retort.updated_at).to eq_time time + 11.seconds
@@ -184,18 +165,13 @@ describe DiscourseRetort::RetortsController do
       before(:example) do
         SiteSetting.retort_withdraw_tolerance = 10
         travel_to time do
-          Retort.create(
-            post_id: first_post.id,
-            user_id: user.id,
-            emoji: emoji
-          ).trash!(user)
+          Retort.create(post_id: first_post.id, user_id: user.id, emoji: emoji).trash!(user)
         end
         travel_to time + 6.seconds do
-          Retort.with_deleted.find_by(
-            post_id: first_post.id,
-            user_id: user.id,
-            emoji: emoji
-          ).recover!
+          Retort
+            .with_deleted
+            .find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
+            .recover!
         end
       end
 
@@ -205,8 +181,7 @@ describe DiscourseRetort::RetortsController do
           delete "/retorts/#{first_post.id}.json", params: { retort: emoji }
         end
         expect(JSON.parse(response.body)["id"]).to eq first_post.id
-        retort =
-          Retort.with_deleted.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
+        retort = Retort.with_deleted.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
         expect(retort.deleted_at).to eq_time time + 7.seconds
         expect(retort.deleted_by).to eq user
         expect(retort.updated_at).to eq_time time + 7.seconds
@@ -220,8 +195,7 @@ describe DiscourseRetort::RetortsController do
         end
         expect(response.status).to eq(200)
         expect(JSON.parse(response.body)["id"]).to eq first_post.id
-        retort =
-          Retort.with_deleted.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
+        retort = Retort.with_deleted.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
         expect(retort.deleted_at).to eq_time time + 12.seconds
         expect(retort.deleted_by).to eq user
         expect(retort.updated_at).to eq_time time + 12.seconds
@@ -234,8 +208,7 @@ describe DiscourseRetort::RetortsController do
           delete "/retorts/#{first_post.id}.json", params: { retort: emoji }
         end
         expect(response.status).to eq(403)
-        retort =
-          Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
+        retort = Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji)
         expect(retort.deleted_at).to be_nil
         expect(retort.deleted_by).to be_nil
         expect(retort.updated_at).to eq_time time + 6.seconds
@@ -250,11 +223,7 @@ describe DiscourseRetort::RetortsController do
         delete "/retorts/#{first_post.id}/all.json", params: { retort: "heart" }
         expect(response.status).to eq(403)
         expect(
-          Retort.find_by(
-            post_id: first_post.id,
-            user_id: user.id,
-            emoji: "heart"
-          )
+          Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: "heart"),
         ).not_to be_nil
       end
     end
@@ -271,11 +240,7 @@ describe DiscourseRetort::RetortsController do
 
       before(:example) do
         Retort.create(post_id: first_post.id, user_id: user.id, emoji: emoji)
-        Retort.create(
-          post_id: first_post.id,
-          user_id: another_user.id,
-          emoji: emoji
-        )
+        Retort.create(post_id: first_post.id, user_id: another_user.id, emoji: emoji)
       end
 
       it "can remove" do
@@ -283,20 +248,14 @@ describe DiscourseRetort::RetortsController do
         delete "/retorts/#{first_post.id}/all.json", params: { retort: emoji }
         expect(response.status).to eq(200)
         expect(JSON.parse(response.body)["id"]).to eq first_post.id
-        expect(
-          Retort.find_by(post_id: first_post.id, emoji: emoji, deleted_at: nil)
-        ).to be_nil
-        expect(
-          Retort.where(post_id: first_post.id, emoji: emoji).pluck(:deleted_by_id)
-        ).to all eq(staff.id)
+        expect(Retort.find_by(post_id: first_post.id, emoji: emoji, deleted_at: nil)).to be_nil
+        expect(Retort.where(post_id: first_post.id, emoji: emoji).pluck(:deleted_by_id)).to all eq(
+              staff.id,
+            )
       end
 
       it "can not recover after removed by staff" do
-        Retort.find_by(
-          post_id: first_post.id,
-          user_id: user.id,
-          emoji: emoji
-        ).trash!(user)
+        Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: emoji).trash!(user)
         sign_in(staff)
         delete "/retorts/#{first_post.id}/all.json", params: { retort: emoji }
         expect(response.status).to eq(200)

@@ -1,16 +1,16 @@
-{{#if siteSettings.retort_enabled}}
+{{#if this.siteSettings.retort_enabled}}
   <div class="control-group retort">
     <label class="control-label">{{i18n "retort.retort"}}</label>
     <div class="controls">
       {{preference-checkbox
         labelKey="retort.disable_retorts"
-        checked=model.custom_fields.disable_retorts
+        checked=@model.custom_fields.disable_retorts
       }}
     </div>
     <div class="controls">
       {{preference-checkbox
         labelKey="retort.hide_ignored_retorts"
-        checked=model.custom_fields.hide_ignored_retorts
+        checked=@model.custom_fields.hide_ignored_retorts
       }}
     </div>
   </div>

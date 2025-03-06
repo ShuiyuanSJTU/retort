@@ -14,9 +14,7 @@ describe Retort do
   let(:altermoji) { "puntrear" }
 
   describe "initialize" do
-    let(:retort) do
-      Retort.create(post_id: post.id, user_id: user.id, emoji: emoji)
-    end
+    let(:retort) { Retort.create(post_id: post.id, user_id: user.id, emoji: emoji) }
 
     it "stores the record" do
       expect(retort.post).to eq post
@@ -36,9 +34,9 @@ describe Retort do
 
   describe "checks ActiveRecord valid" do
     it "is invalid emoji" do
-      expect {
-        Retort.create(post_id: post.id, user_id: user.id, emoji: nil).save!
-      }.to raise_error(ActiveRecord::RecordInvalid)
+      expect { Retort.create(post_id: post.id, user_id: user.id, emoji: nil).save! }.to raise_error(
+        ActiveRecord::RecordInvalid,
+      )
     end
     it "is invalid post" do
       invalid_post_id = post.id + 100_000
@@ -47,16 +45,12 @@ describe Retort do
       }.to raise_error ActiveRecord::InvalidForeignKey
     end
     it "is valid" do
-      expect {
-        Retort.create(post_id: post.id, user_id: user.id, emoji: emoji)
-      }.not_to raise_error
+      expect { Retort.create(post_id: post.id, user_id: user.id, emoji: emoji) }.not_to raise_error
     end
   end
 
   describe "when create, withdraw, toggle" do
-    let(:retort) do
-      Retort.create(post_id: post.id, user_id: user.id, emoji: emoji)
-    end
+    let(:retort) { Retort.create(post_id: post.id, user_id: user.id, emoji: emoji) }
 
     it "can not create twice" do
       expect(retort).not_to be_nil
@@ -67,16 +61,16 @@ describe Retort do
 
     it "can withdraw" do
       expect { retort.trash!(user) }.to change { retort.deleted_at }.from(nil).to(
-        be_present
+        be_present,
       ).and change { retort.deleted_by }.from(nil).to(user)
     end
 
     it "can recover" do
       original_created_at = retort.created_at
       retort.trash!(user)
-      expect { retort.recover! }.to change { retort.deleted_at }.from(
-        be_present
-      ).to(nil).and change { retort.deleted_by }.from(user).to(nil)
+      expect { retort.recover! }.to change { retort.deleted_at }.from(be_present).to(
+        nil,
+      ).and change { retort.deleted_by }.from(user).to(nil)
       expect(retort.created_at).to eq_time original_created_at
       expect(retort.updated_at).not_to eq_time original_created_at
     end

@@ -1,11 +1,11 @@
 import { h } from "virtual-dom";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 import { createWidget } from "discourse/widgets/widget";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 
 export default createWidget("retort-toggle", {
   tagName: "button.post-retort",
-  services: ['retort'],
+  services: ["retort"],
 
   buildClasses(attrs) {
     const classList = [];
@@ -28,7 +28,8 @@ export default createWidget("retort-toggle", {
     }
     const { post, emoji } = this.attrs;
     if (this.isMyRetort()) {
-      this.retort.withdrawRetort(post, emoji)
+      this.retort
+        .withdrawRetort(post, emoji)
         .then((data) => {
           post.set("retorts", data.retorts);
           post.set("my_retorts", data.my_retorts);
@@ -36,7 +37,8 @@ export default createWidget("retort-toggle", {
         })
         .catch(popupAjaxError);
     } else {
-      this.retort.createRetort(post, emoji)
+      this.retort
+        .createRetort(post, emoji)
         .then((data) => {
           post.set("retorts", data.retorts);
           post.set("my_retorts", data.my_retorts);
@@ -47,7 +49,9 @@ export default createWidget("retort-toggle", {
   },
 
   isMyRetort() {
-    return this.attrs.usernames.any((username) => username === this.currentUser?.username);
+    return this.attrs.usernames.any(
+      (username) => username === this.currentUser?.username
+    );
   },
 
   myRetortUpdateTime() {
@@ -101,7 +105,7 @@ export default createWidget("retort-toggle", {
         break;
     }
 
-    return I18n.t(key, {
+    return i18n(key, {
       emoji,
       first: usernames[0],
       second: usernames[1],

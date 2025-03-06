@@ -3,7 +3,7 @@ import { createWidget } from "discourse/widgets/widget";
 
 createWidget("post-retort-container", {
   tagName: "div.post-retort-container",
-  services: ['retort'],
+  services: ["retort"],
 
   buildKey: (attrs) => `post-retort-container-${attrs.post.id}`,
 

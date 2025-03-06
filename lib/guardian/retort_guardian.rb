@@ -3,20 +3,14 @@
 # mixin for all guardian methods dealing with retort permissions
 module DiscourseRetort::RetortGuardian
   def can_create_retort?
-    if SiteSetting.retort_disabled_users.split("|").include?(@user.username)
-      return false
-    end
+    return false if SiteSetting.retort_disabled_users.split("|").include?(@user.username)
     return false if @user.silenced?
     true
   end
 
   def can_create_retort_on_topic?(topic)
     return false if topic.archived?
-    if SiteSetting
-         .retort_disabled_categories
-         .split("|")
-         .map(&:to_i)
-         .include?(topic.category_id)
+    if SiteSetting.retort_disabled_categories.split("|").map(&:to_i).include?(topic.category_id)
       return false
     end
     true
@@ -38,9 +32,7 @@ module DiscourseRetort::RetortGuardian
   def can_withdraw_retort?(retort)
     return false if retort.nil?
     return false unless is_my_own?(retort)
-    if retort.updated_at < SiteSetting.retort_withdraw_tolerance.second.ago
-      return false
-    end
+    return false if retort.updated_at < SiteSetting.retort_withdraw_tolerance.second.ago
     true
   end
 

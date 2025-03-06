@@ -14,13 +14,13 @@ export default class RetortButton extends Component {
 
   @action
   onSelectEmoji(emoji) {
-    this.retort.createRetort(this.args.post, emoji)
+    this.retort
+      .createRetort(this.args.post, emoji)
       .then((data) => {
-          this.args.post.set("retorts", data.retorts);
-          this.args.post.set("my_retorts", data.my_retorts);
-          this.appEvents.trigger("post-stream:refresh", { id: data.id });
-        }
-      )
+        this.args.post.set("retorts", data.retorts);
+        this.args.post.set("my_retorts", data.my_retorts);
+        this.appEvents.trigger("post-stream:refresh", { id: data.id });
+      })
       .catch(popupAjaxError);
   }
 

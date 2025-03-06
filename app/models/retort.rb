@@ -37,8 +37,7 @@ class Retort < ActiveRecord::Base
   include RateLimiter::OnCreateRecord
   rate_limit :retort_rate_limiter
   def retort_rate_limiter
-    @rate_limiter ||=
-      RateLimiter.new(user, "create_retort", retort_max_per_day, 1.day.to_i)
+    @rate_limiter ||= RateLimiter.new(user, "create_retort", retort_max_per_day, 1.day.to_i)
   end
 
   def retort_max_per_day
