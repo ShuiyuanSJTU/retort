@@ -6,6 +6,6 @@ on:
 
 jobs:
   ci:
-    uses: ShuiyuanSJTU/.github/.github/workflows/discourse-plugin.yml@v1
+    uses: ShuiyuanSJTU/.github/.github/workflows/discourse-plugin.yml@main
     with: 
       linting: false
