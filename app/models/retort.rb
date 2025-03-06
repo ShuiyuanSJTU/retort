@@ -66,14 +66,14 @@ end
 #
 # Table name: retorts
 #
-#  id         :bigint           not null, primary key
-#  emoji      :string
-#  post_id    :integer
-#  user_id    :integer
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  deleted_at :datetime
-#  deleted_by :integer
+#  id            :bigint           not null, primary key
+#  emoji         :string
+#  post_id       :integer
+#  user_id       :integer
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  deleted_at    :datetime
+#  deleted_by_id :integer
 #
 # Indexes
 #
@@ -81,7 +81,6 @@ end
 #  index_retorts_on_post_id                        (post_id)
 #  index_retorts_on_post_id_and_user_id_and_emoji  (post_id,user_id,emoji) UNIQUE
 #  index_retorts_on_user_id                        (user_id)
-#  retorts_post_id_idx                             (post_id)
 #
 # Foreign Keys
 #
