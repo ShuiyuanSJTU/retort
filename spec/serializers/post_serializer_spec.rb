@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe PostSerializer do
-  let(:post) { Fabricate(:post) }
+  let(:post) { Fabricate(:post, topic: Fabricate(:topic, category: Fabricate(:category))) }
   let(:user1) { Fabricate(:user) }
   let(:user2) { Fabricate(:user) }
 

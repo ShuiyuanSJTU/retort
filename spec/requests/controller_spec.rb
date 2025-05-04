@@ -7,7 +7,7 @@ describe DiscourseRetort::RetortsController do
     include ActiveSupport::Testing::TimeHelpers
     let(:user) { Fabricate(:user) }
     let(:disabled_category) { Fabricate :category }
-    let(:topic) { Fabricate :topic }
+    let(:topic) { Fabricate :topic, category: Fabricate(:category) }
     let(:another_topic) { Fabricate :topic, category: disabled_category }
     let(:first_post) { Fabricate :post, topic: topic }
     let(:another_post) { Fabricate :post, topic: another_topic }
@@ -36,6 +36,7 @@ describe DiscourseRetort::RetortsController do
           sign_in(user)
           put "/retorts/#{first_post.id}.json", params: { retort: "heart" }
         end
+        expect(response.status).to eq(200)
         expect(JSON.parse(response.body)["id"]).to eq first_post.id
         new_retort = Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: "heart")
         expect(new_retort).not_to be_nil
