@@ -1,10 +1,9 @@
 zh_CN:
   js:
     retort:
-      retort: '表情插件'
+      title: '表情插件'
       hide_ignored_retorts: '不显示被屏蔽用户的表情'
       disable_retorts: "不显示帖表情（仅对我不显示）"
-      title: '对此帖子添加一个表情'
       section:
         title: "推荐"
       reactions:

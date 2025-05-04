@@ -1,10 +1,9 @@
 en:
   js:
     retort:
-      retort: 'Retort'
+      title: 'Retort'
       hide_ignored_retorts: 'Do not show emojis from ignored users'
       disable_retorts: "Disable Retort for myself"
-      title: 'add an emoji reaction to this post'
       section:
         title: "Suggested"
       reactions:
