@@ -2,6 +2,7 @@ en:
   js:
     retort:
       title: 'Retort'
+      preference_title: 'Retort Plugin'
       hide_ignored_retorts: 'Do not show emojis from ignored users'
       disable_retorts: "Disable Retort for myself"
       section:

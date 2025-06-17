@@ -7,7 +7,7 @@ function initializePlugin(api) {
   const currentUser = api.getCurrentUser();
 
   api.modifyClass(
-    "controller:preferences/notifications",
+    "controller:preferences/interface",
     (Superclass) =>
       class extends Superclass {
         @action
