@@ -55,17 +55,21 @@ describe DiscourseRetort::RetortsController do
         sign_in(user)
         put "/retorts/#{first_post.id}.json", params: { retort: "+1" }
         expect(response.status).to eq(422)
-        expect(JSON.parse(response.body)["error"]).to eq I18n.t("retort.error.disabled_emojis")
+        expect(JSON.parse(response.body)["errors"].first).to eq I18n.t(
+             "retort.error.disabled_emojis",
+           )
         put "/retorts/#{first_post.id}.json", params: { retort: "laughing" }
         expect(response.status).to eq(422)
-        expect(JSON.parse(response.body)["error"]).to eq I18n.t("retort.error.disabled_emojis")
+        expect(JSON.parse(response.body)["errors"].first).to eq I18n.t(
+             "retort.error.disabled_emojis",
+           )
       end
 
       it "can not create invalid emoji" do
         sign_in(user)
         put "/retorts/#{first_post.id}.json", params: { retort: "invalid__" }
         expect(response.status).to eq(422)
-        expect(JSON.parse(response.body)["error"]).to eq I18n.t("retort.error.missing_emoji")
+        expect(JSON.parse(response.body)["errors"].first).to eq I18n.t("retort.error.missing_emoji")
       end
 
       it "can not create on archived post" do
@@ -80,6 +84,15 @@ describe DiscourseRetort::RetortsController do
         sign_in(user)
         put "/retorts/#{first_post.id}.json", params: { retort: "heart" }
         expect(response.status).to eq(403)
+      end
+
+      it "can resolve alias emoji" do
+        sign_in(user)
+        put "/retorts/#{first_post.id}.json", params: { retort: "xray" }
+        expect(response.status).to eq(200)
+        expect(
+          Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: "x_ray"),
+        ).to be_present
       end
     end
 

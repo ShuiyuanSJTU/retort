@@ -60,6 +60,30 @@ class Retort < ActiveRecord::Base
   def self.clear_cache(post_id)
     Discourse.cache.delete(Retort.cache_key(post_id))
   end
+
+  def self.resolve_emoji_alias(alias_name)
+    @alias_to_original_map ||=
+      begin
+        map = {}
+        Emoji.aliases_db.each { |original, aliases| aliases.each { |a| map[a] = original } }
+        map
+      end
+    @alias_to_original_map[alias_name] || alias_name
+  end
+
+  def self.normalize_emoji(emoji)
+    # Remove any leading or trailing colons and resolve aliases
+    emoji = emoji.downcase.delete_prefix(":").delete_suffix(":")
+    emoji_name = emoji.gsub(/\A(.+):t[1-6]\z/, '\1')
+    original_name = resolve_emoji_alias(emoji_name)
+    emoji.gsub(emoji_name, original_name)
+  end
+
+  def self.emoji_exists?(emoji)
+    emoji = normalize_emoji(emoji)
+    return false if emoji.blank?
+    Emoji.exists?(emoji)
+  end
 end
 
 # == Schema Information
