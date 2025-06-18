@@ -2,7 +2,7 @@
 class RetortsController < ::ApplicationController
   requires_plugin DiscourseRetort::PLUGIN_NAME
   before_action :verify_post_and_user, only: %i[update remove create withdraw]
-  before_action :normalize_emoji, only: %i[create update withdraw remove]
+  before_action :normalize_emoji, only: %i[create update withdraw]
 
   rescue_from Discourse::InvalidParameters do |e|
     render_json_error e.message, status: 422
@@ -96,6 +96,8 @@ class RetortsController < ::ApplicationController
 
   def remove
     guardian.ensure_can_moderate_retort!(post)
+    # Do not resolve emoji alias here, as we want to remove the exact retort
+    @emoji = params.require(:retort)
 
     result = Retort.remove_retort(post.id, @emoji, current_user)
     if result.present?

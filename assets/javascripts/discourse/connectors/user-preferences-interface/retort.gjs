@@ -9,7 +9,9 @@ export default class Retort extends Component {
   <template>
     {{#if this.siteSettings.retort_enabled}}
       <fieldset class="control-group retort">
-        <legend class="control-label">{{i18n "retort.preference_title"}}</legend>
+        <legend class="control-label">{{i18n
+            "retort.preference_title"
+          }}</legend>
         <div class="controls">
           <PreferenceCheckbox
             @labelKey="retort.disable_retorts"
