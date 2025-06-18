@@ -29,9 +29,8 @@ class Retort < ActiveRecord::Base
     if exist_record.present?
       exist_record.update_all(deleted_at: Time.now, updated_at: Time.now, deleted_by_id: actor.id)
       Retort.clear_cache(post_id)
-      return true
     end
-    false
+    exist_record
   end
 
   include RateLimiter::OnCreateRecord

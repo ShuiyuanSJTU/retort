@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-class DiscourseRetort::RetortsController < ::ApplicationController
+class RetortsController < ::ApplicationController
   requires_plugin DiscourseRetort::PLUGIN_NAME
   before_action :verify_post_and_user, only: %i[update remove create withdraw]
   before_action :normalize_emoji, only: %i[create update withdraw remove]

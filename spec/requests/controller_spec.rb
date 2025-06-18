@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-describe DiscourseRetort::RetortsController do
+describe RetortsController do
   describe "normal user" do
     include ActiveSupport::Testing::TimeHelpers
     let(:user) { Fabricate(:user) }
