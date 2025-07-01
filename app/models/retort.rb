@@ -63,8 +63,17 @@ class Retort < ActiveRecord::Base
   def self.resolve_emoji_alias(alias_name)
     @alias_to_original_map ||=
       begin
+        # Retrieve from redis for performance
+        standard_emoji = Emoji.standard.map(&:name).to_set
         map = {}
-        Emoji.aliases_db.each { |original, aliases| aliases.each { |a| map[a] = original } }
+        Emoji.aliases.each do |original, aliases|
+          # It's possible that the original emoji is not present in the Emoji database,
+          # might be buggy data
+          if standard_emoji.include?(original)
+            # Making sure no cyclic references
+            aliases.each { |a| map[a] = original unless map.key?(a) }
+          end
+        end
         map
       end
     @alias_to_original_map[alias_name] || alias_name
