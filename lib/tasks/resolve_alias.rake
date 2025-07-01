@@ -16,12 +16,15 @@ task "retort:resolve-alias", [] => [:environment] do |_, args|
       alias_map[emoji] = normized_emoji
     end
   end
-  puts "Found #{invalid_emojis.length} invalid emojis."
   puts "Found #{alias_map.length} emojis that need to be updated."
-  puts "Removing invalid emojis from retort table."
-  Retort.unscoped.where(emoji: invalid_emojis).delete_all
+  if invalid_emojis.any?
+    puts "Found #{invalid_emojis.length} invalid emojis: #{invalid_emojis.join(', ')}"
+    puts "Removing invalid emojis from retort table."
+    Retort.unscoped.where(emoji: invalid_emojis).delete_all
+  end
   puts "Updating emojis in retort table."
   alias_map.each do |old_emoji, new_emoji|
+    puts "#{old_emoji} -> #{new_emoji}"
     begin
       Retort.unscoped.where(emoji: old_emoji).update_all(emoji: new_emoji)
     rescue ActiveRecord::RecordNotUnique
@@ -38,7 +41,7 @@ task "retort:resolve-alias", [] => [:environment] do |_, args|
             AND r1.post_id = r2.post_id)",
             new_emoji,
           )
-          .delete_all
+          .destroy_all
         Retort.unscoped.where(emoji: old_emoji).update_all(emoji: new_emoji)
       end
     end
