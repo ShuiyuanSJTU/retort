@@ -18,7 +18,7 @@ task "retort:resolve-alias", [] => [:environment] do |_, args|
   end
   puts "Found #{alias_map.length} emojis that need to be updated."
   if invalid_emojis.any?
-    puts "Found #{invalid_emojis.length} invalid emojis: #{invalid_emojis.join(', ')}"
+    puts "Found #{invalid_emojis.length} invalid emojis: #{invalid_emojis.join(", ")}"
     puts "Removing invalid emojis from retort table."
     Retort.unscoped.where(emoji: invalid_emojis).delete_all
   end
