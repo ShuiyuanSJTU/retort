@@ -1,5 +1,4 @@
 import { action } from "@ember/object";
-import { withSilencedDeprecations } from "discourse/lib/deprecated";
 import { getOwnerWithFallback } from "discourse/lib/get-owner";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import PostRetortContainer from "../components/post-retort-container";
@@ -26,12 +25,6 @@ function initializePlugin(api) {
 
   api.addTrackedPostProperties("can_retort", "my_retorts", "retorts");
   api.renderAfterWrapperOutlet("post-content-cooked-html", PostRetortContainer);
-  withSilencedDeprecations("discourse.post-stream-widget-overrides", () => {
-    api.decorateWidget("post-contents:after-cooked", (helper) => {
-      const post = helper.getModel();
-      return helper.attach("post-retort-container", { post });
-    });
-  });
 
   api.addPostClassesCallback((attrs) => {
     const Retort = getOwnerWithFallback(api).lookup("service:retort");
