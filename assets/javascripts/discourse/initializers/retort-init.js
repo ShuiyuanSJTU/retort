@@ -39,7 +39,9 @@ function initializePlugin(api) {
       class extends Superclass {
         onRetortUpdate(data) {
           const { id, retorts } = data;
-          const post = this.get("model.postStream.posts").findBy("id", id);
+          const post = this.get("model.postStream.posts").find(
+            (p) => p.id === id
+          );
           if (post) {
             post.setProperties({ retorts });
             this.appEvents.trigger("post-stream:refresh", {

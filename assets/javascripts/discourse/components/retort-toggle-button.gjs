@@ -54,8 +54,10 @@ export default class RetortToggleButton extends Component {
   }
 
   get isMyRetort() {
-    return this.args.usernames.any(
-      (username) => username === this.currentUser?.username
+    return (
+      this.args.usernames.findIndex(
+        (username) => username === this.currentUser?.username
+      ) > -1
     );
   }
 
