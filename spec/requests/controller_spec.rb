@@ -144,11 +144,7 @@ describe RetortsController do
         put "/retorts/#{first_post.id}.json", params: { retort: ":basketball_man:t4:" }
         expect(response.status).to eq(200)
         expect(
-          Retort.find_by(
-            post_id: first_post.id,
-            user_id: user.id,
-            emoji: "man_bouncing_ball:t4",
-          ),
+          Retort.find_by(post_id: first_post.id, user_id: user.id, emoji: "man_bouncing_ball:t4"),
         ).to be_present
       end
     end

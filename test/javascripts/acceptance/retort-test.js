@@ -32,87 +32,87 @@ acceptance("Retorts", function (needs) {
     );
   });
 
-  test("show retort", async function (assert) {
+  test("renders enabled-post retorts with the expected current-user and withdraw states", async function (assert) {
     await visit("/t/retort-topic/114514");
 
     assert.strictEqual(
       count("#post_1 .post-retort-container button.post-retort"),
       4,
-      "There are 4 retorts in the post"
+      "post 1 renders all four retort buttons from the server payload"
     );
     assert.strictEqual(
       count("#post_1 .post-retort-container button.post-retort.my-retort"),
       3,
-      "There are 3 retorts from the current user"
+      "post 1 marks the three current-user retorts with the my-retort class"
     );
-    assert.ok(
+    assert.true(
       visible("#post_1 .actions button.retort"),
-      "The retort button is visible"
+      "post 1 shows the retort picker trigger when adding retorts is allowed"
     );
     assert.strictEqual(
       query(
         "#post_1 .post-retort-container button.post-retort.my-retort.disabled img"
       ).getAttribute("alt"),
       ":pouting_cat:",
-      "The retort button is disabled"
+      "post 1 keeps the expired current-user retort disabled"
     );
     assert.strictEqual(
       query(
         "#post_1 .post-retort-container button.post-retort.my-retort:not(.disabled) img"
       ).getAttribute("alt"),
       ":+1:",
-      "The retort button is enabled"
+      "post 1 keeps a withdrawable current-user retort enabled"
     );
   });
 
-  test("disabled retort", async function (assert) {
+  test("renders retorts as fully disabled when the post cannot receive new retorts", async function (assert) {
     await visit("/t/retort-topic/114514");
 
     assert.strictEqual(
       count("#post_2 .post-retort-container button.post-retort"),
       3,
-      "There are 3 retorts in the post"
+      "post 2 still renders the three existing retort buttons"
     );
     assert.strictEqual(
       count("#post_2 .post-retort-container button.post-retort.my-retort"),
       2,
-      "There are 2 retorts from the current user"
+      "post 2 still marks the two current-user retorts with the my-retort class"
     );
-    assert.notOk(
+    assert.false(
       visible("#post_2 .actions button.retort"),
-      "The retort button is not visible"
+      "post 2 hides the retort picker trigger when retorts are disabled"
     );
     assert.strictEqual(
       count("#post_2 .post-retort-container button.post-retort.disabled img"),
       3,
-      "The retort button is disabled"
+      "post 2 renders every retort button in the disabled state"
     );
-    assert.notOk(
+    assert.false(
       exists(
         "#post_2 .post-retort-container button.post-retort:not(.disabled) img"
       ),
-      "No retort button is enabled"
+      "post 2 does not leave any enabled retort buttons behind"
     );
   });
 
-  test("can remove retort", async function (assert) {
+  test("shows remove controls when the current user can moderate retorts", async function (assert) {
     await visit("/t/retort-topic/114514");
 
     assert.strictEqual(
       count("#post_3 .post-retort-container button.post-retort .remove-retort"),
       3,
-      "There are 3 remove retorts btn in the post"
+      "post 3 renders one remove control for each visible retort button"
     );
   });
 
-  test("make requests", async function (assert) {
+  test("withdraws an active current-user retort instead of creating a new one", async function (assert) {
     const putEndpoint = sinon.spy();
     const deleteEndpoint = sinon.spy();
     await visit("/t/retort-topic/114514");
     assert.strictEqual(
       count("#post_1 .post-retort-container button.post-retort"),
       4,
-      "There are 4 retorts in the post"
+      "post 1 starts with the expected retort buttons before interaction"
     );
     pretender.put("/retorts/398.json", () => {
       putEndpoint();
@@ -125,63 +125,89 @@ acceptance("Retorts", function (needs) {
     await click(
       "#post_1 .post-retort-container button.post-retort:not(.disabled)"
     );
-    assert.true(deleteEndpoint.calledOnce, "requested once for withdraw");
-    assert.true(putEndpoint.notCalled, "no request for create");
-  });
-
-  test("pop selector", async function (assert) {
-    await visit("/t/retort-topic/114514");
-    assert.notOk(visible(".emoji-picker"), "The emoji picker is not visible");
-    await click("#post_1 .actions button.retort");
-    assert.ok(visible(".emoji-picker"), "The emoji picker is visible");
-    await click(".emoji-picker__section-emojis img[title=':grinning:']");
-    assert.notOk(visible(".emoji-picker"), "The emoji picker is not visible");
-    assert.ok(
-      visible("#post_1 button.post-retort:has(img[alt=':grinning:'])"),
-      "New retort is visible"
+    assert.true(
+      deleteEndpoint.calledOnce,
+      "clicking an active current-user retort sends exactly one withdraw request"
+    );
+    assert.true(
+      putEndpoint.notCalled,
+      "clicking an active current-user retort does not send a create request"
     );
   });
 
-  test("pop ajax error", async function (assert) {
+  test("opens the picker and renders a new retort after emoji selection", async function (assert) {
     await visit("/t/retort-topic/114514");
-    await click("#post_3 .not-my-retort");
-    assert.ok(visible("#dialog-holder"), "The dialog is visible");
-    await click("#dialog-holder .dialog-footer .btn-primary");
-    assert.notOk(visible("#dialog-holder"), "The dialog is not visible");
+    assert.false(
+      visible(".emoji-picker"),
+      "the emoji picker starts hidden before the trigger is clicked"
+    );
+    await click("#post_1 .actions button.retort");
+    assert.true(
+      visible(".emoji-picker"),
+      "clicking the retort trigger opens the emoji picker"
+    );
+    await click(".emoji-picker__section-emojis img[title=':grinning:']");
+    assert.false(
+      visible(".emoji-picker"),
+      "selecting an emoji closes the emoji picker again"
+    );
+    assert.true(
+      visible("#post_1 button.post-retort:has(img[alt=':grinning:'])"),
+      "the newly created grinning retort becomes visible on the post"
+    );
   });
 
-  test("message bus", async function (assert) {
+  test("shows and dismisses the error dialog after a failed retort request", async function (assert) {
+    await visit("/t/retort-topic/114514");
+    await click("#post_3 .not-my-retort");
+    assert.true(
+      visible("#dialog-holder"),
+      "a failed retort request opens the error dialog"
+    );
+    await click("#dialog-holder .dialog-footer .btn-primary");
+    assert.false(
+      visible("#dialog-holder"),
+      "confirming the dialog closes the error dialog again"
+    );
+  });
+
+  test("updates rendered retorts when a message bus payload arrives", async function (assert) {
     await visit("/t/retort-topic/114514");
     await publishToMessageBus(
       "/retort/topics/114514",
       retortFixtures["/retort/topics/114514.json"]
     );
-    assert.ok(
+    assert.true(
       visible(
         "#post_1 .post-retort-container button.post-retort:has(img[alt=':innocent:'])"
-      )
+      ),
+      "the message bus payload adds the newly broadcast innocent retort"
     );
     assert.strictEqual(
       query(
         "#post_1 .post-retort-container button.post-retort:has(img[alt=':+1:']) .post-retort__count"
       ).innerText,
-      "7"
+      "7",
+      "the message bus payload updates the +1 retort count"
     );
     assert.strictEqual(
       query(
         "#post_1 .post-retort-container button.post-retort:has(img[alt=':smile:']) .post-retort__count"
       ).innerText,
-      "2"
+      "2",
+      "the message bus payload updates the smile retort count"
     );
-    assert.ok(
+    assert.true(
       visible(
         "#post_1 .post-retort-container button.post-retort.not-my-retort img[alt=':ocean:']"
-      )
+      ),
+      "the message bus payload keeps non-current-user retorts marked as not-my-retort"
     );
-    assert.ok(
+    assert.true(
       visible(
         "#post_1 .post-retort-container button.post-retort.my-retort img[alt=':+1:']"
-      )
+      ),
+      "the message bus payload keeps current-user retorts marked as my-retort"
     );
   });
 });

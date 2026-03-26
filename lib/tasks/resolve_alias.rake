@@ -31,8 +31,7 @@ task "retort:resolve-alias", [] => [:environment] do
           .unscoped
           .from("retorts AS old_retorts")
           .where("old_retorts.emoji = ?", old_emoji)
-          .where(
-            <<~SQL,
+          .where(<<~SQL, new_emoji)
               EXISTS (
                 SELECT 1
                 FROM retorts AS new_retorts
@@ -41,8 +40,6 @@ task "retort:resolve-alias", [] => [:environment] do
                   AND new_retorts.post_id = old_retorts.post_id
               )
             SQL
-            new_emoji,
-          )
 
       # Remove rows that would violate the unique index after normalization.
       Retort.unscoped.where(id: conflicting_retorts.select("old_retorts.id")).delete_all
