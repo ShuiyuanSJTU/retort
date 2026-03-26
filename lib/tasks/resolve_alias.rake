@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 desc "Replace emojis in retort table with their normalized versions and remove invalid emojis"
-task "retort:resolve-alias", [] => [:environment] do |_, args|
+task "retort:resolve-alias", [] => [:environment] do
   table_existing_emojis = Retort.unscoped.select(:emoji).distinct.pluck(:emoji)
   puts "#{table_existing_emojis.length} existing emojis found in retort table."
   non_existing_emojis = table_existing_emojis.reject { |e| Emoji[e].present? }
@@ -9,11 +9,11 @@ task "retort:resolve-alias", [] => [:environment] do |_, args|
   alias_map = {}
   invalid_emojis = []
   non_existing_emojis.each do |emoji|
-    normized_emoji = Retort.normalize_emoji(emoji)
-    if !Emoji[normized_emoji].present?
+    normalized_emoji = Retort.normalize_emoji(emoji)
+    if !Emoji[normalized_emoji].present?
       invalid_emojis << emoji
     else
-      alias_map[emoji] = normized_emoji
+      alias_map[emoji] = normalized_emoji
     end
   end
   puts "Found #{alias_map.length} emojis that need to be updated."
@@ -25,25 +25,28 @@ task "retort:resolve-alias", [] => [:environment] do |_, args|
   puts "Updating emojis in retort table."
   alias_map.each do |old_emoji, new_emoji|
     puts "#{old_emoji} -> #{new_emoji}"
-    begin
-      Retort.unscoped.where(emoji: old_emoji).update_all(emoji: new_emoji)
-    rescue ActiveRecord::RecordNotUnique
-      Retort.transaction do
+    Retort.transaction do
+      conflicting_retorts =
         Retort
           .unscoped
-          .select("r1.*")
-          .from(Retort.unscoped, :r1)
-          .where("r1.emoji = ?", old_emoji)
+          .from("retorts AS old_retorts")
+          .where("old_retorts.emoji = ?", old_emoji)
           .where(
-            "EXISTS (SELECT 1 FROM retorts AS r2
-            WHERE r2.emoji = ?
-            AND r1.user_id = r2.user_id
-            AND r1.post_id = r2.post_id)",
+            <<~SQL,
+              EXISTS (
+                SELECT 1
+                FROM retorts AS new_retorts
+                WHERE new_retorts.emoji = ?
+                  AND new_retorts.user_id = old_retorts.user_id
+                  AND new_retorts.post_id = old_retorts.post_id
+              )
+            SQL
             new_emoji,
           )
-          .destroy_all
-        Retort.unscoped.where(emoji: old_emoji).update_all(emoji: new_emoji)
-      end
+
+      # Remove rows that would violate the unique index after normalization.
+      Retort.unscoped.where(id: conflicting_retorts.select("old_retorts.id")).delete_all
+      Retort.unscoped.where(emoji: old_emoji).update_all(emoji: new_emoji)
     end
   end
 end
