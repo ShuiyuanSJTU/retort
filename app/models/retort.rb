@@ -60,31 +60,16 @@ class Retort < ActiveRecord::Base
     Discourse.cache.delete(Retort.cache_key(post_id))
   end
 
-  def self.resolve_emoji_alias(alias_name)
-    @alias_to_original_map ||=
-      begin
-        # Retrieve from redis for performance
-        standard_emoji = Emoji.standard.map(&:name).to_set
-        map = {}
-        Emoji.aliases.each do |original, aliases|
-          # It's possible that the original emoji is not present in the Emoji database,
-          # might be buggy data
-          if standard_emoji.include?(original)
-            # Making sure no cyclic references
-            aliases.each { |a| map[a] = original unless map.key?(a) }
-          end
-        end
-        map
-      end
-    @alias_to_original_map[alias_name] || alias_name
-  end
-
   def self.normalize_emoji(emoji)
-    # Remove any leading or trailing colons and resolve aliases
     emoji = emoji.downcase.delete_prefix(":").delete_suffix(":")
-    emoji_name = emoji.gsub(/\A(.+):t[1-6]\z/, '\1')
-    original_name = resolve_emoji_alias(emoji_name)
-    emoji.gsub(emoji_name, original_name)
+    return emoji if emoji.blank?
+
+    tone_suffix = emoji.match(/:t[1-6]\z/)&.to_s
+    emoji_name = tone_suffix.present? ? emoji.delete_suffix(tone_suffix) : emoji
+
+    canonical_name =
+      Emoji[emoji]&.name || Emoji[emoji_name]&.name || Emoji.resolve_alias(emoji_name)
+    "#{canonical_name}#{tone_suffix}"
   end
 
   def self.emoji_exists?(emoji)

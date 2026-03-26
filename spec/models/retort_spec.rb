@@ -112,4 +112,27 @@ describe Retort do
       expect(retort.updated_at).not_to eq_time original_created_at
     end
   end
+
+  describe ".normalize_emoji" do
+    before(:example) { Emoji.clear_cache }
+    after(:example) { Emoji.clear_cache }
+
+    it "resolves aliases through Discourse's emoji lookup" do
+      expect(Retort.normalize_emoji("xray")).to eq("x_ray")
+      expect(Retort.normalize_emoji(":xray:")).to eq("x_ray")
+    end
+
+    it "resolves aliased skin-tone emoji to their canonical names" do
+      expect(Retort.normalize_emoji("basketball_man:t4")).to eq("man_bouncing_ball:t4")
+      expect(Retort.normalize_emoji(":basketball_man:t4:")).to eq("man_bouncing_ball:t4")
+    end
+
+    it "keeps custom emoji names that contain tone-like segments" do
+      custom_name = "retort#{unique_value("cust")}:t1:foo"
+      CustomEmoji.create!(name: custom_name, upload_id: 9999)
+      Emoji.clear_cache
+
+      expect(Retort.normalize_emoji(":#{custom_name}:")).to eq(custom_name)
+    end
+  end
 end
