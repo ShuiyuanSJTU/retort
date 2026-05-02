@@ -3,10 +3,68 @@ import { concat } from "@ember/helper";
 import { on } from "@ember/modifier";
 import { action } from "@ember/object";
 import { service } from "@ember/service";
+import { modifier } from "ember-modifier";
 import concatClass from "discourse/helpers/concat-class";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 import { i18n } from "discourse-i18n";
 import RetortRemoveEmojiButton from "./retort-remove-emoji-button";
+
+const autoShiftTooltip = modifier((element) => {
+  const adjustTooltipPosition = () => {
+    const tooltip = element.querySelector(".post-retort__tooltip");
+    if (!tooltip) {
+      return;
+    }
+
+    let tooltipWidth = 0;
+    const isHidden = window.getComputedStyle(tooltip).display === "none";
+
+    // Measure width when the tooltip is hidden (display: none)
+    if (isHidden) {
+      const prevDisplay = tooltip.style.display;
+      tooltip.style.display = "inline";
+
+      tooltipWidth = tooltip.getBoundingClientRect().width;
+
+      tooltip.style.display = prevDisplay;
+    } else {
+      tooltipWidth = tooltip.getBoundingClientRect().width;
+    }
+
+    const btnRect = element.getBoundingClientRect();
+    const viewportWidth = document.documentElement.clientWidth;
+    const padding = 8;
+
+    const expectedLeft = btnRect.left + btnRect.width / 2 - tooltipWidth / 2;
+    const expectedRight = btnRect.left + btnRect.width / 2 + tooltipWidth / 2;
+
+    let shift = 0;
+    // Collision detection for viewport edges
+    if (expectedLeft < padding) {
+      shift = padding - expectedLeft;
+    } else if (expectedRight > viewportWidth - padding) {
+      shift = viewportWidth - padding - expectedRight;
+    }
+
+    tooltip.style.transform =
+      shift === 0 ? "" : `translate(calc(-50% + ${shift}px), 0)`;
+  };
+
+  // Sync position on DOM changes (e.g. text update or "remove" icon toggle)
+  const mutationObserver = new MutationObserver(() => adjustTooltipPosition());
+  mutationObserver.observe(element, {
+    childList: true,
+    subtree: true,
+    characterData: true,
+  });
+
+  // Initial calculation
+  adjustTooltipPosition();
+
+  return () => {
+    mutationObserver.disconnect();
+  };
+});
 
 export default class RetortToggleButton extends Component {
   @service currentUser;
@@ -110,6 +168,7 @@ export default class RetortToggleButton extends Component {
       class={{concatClass "post-retort" this.classNames}}
       type="button"
       {{on "click" this.click}}
+      {{autoShiftTooltip}}
     >
       <img class="emoji" src={{@emojiUrl}} alt={{concat ":" @emoji ":"}} />
       <span class="post-retort__count">{{@usernames.length}}</span>
