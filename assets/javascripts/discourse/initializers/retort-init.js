@@ -1,4 +1,3 @@
-import { action } from "@ember/object";
 import { getOwnerWithFallback } from "discourse/lib/get-owner";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import PostRetortContainer from "../components/post-retort-container";
@@ -7,17 +6,7 @@ import RetortButton from "../components/retort-button";
 function initializePlugin(api) {
   const currentUser = api.getCurrentUser();
 
-  api.modifyClass(
-    "controller:preferences/interface",
-    (Superclass) =>
-      class extends Superclass {
-        @action
-        save() {
-          this.get("saveAttrNames").push("custom_fields");
-          super.save();
-        }
-      }
-  );
+  api.addSaveableCustomFields("interface");
 
   if (currentUser?.custom_fields?.disable_retorts) {
     return;
