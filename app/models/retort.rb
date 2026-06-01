@@ -65,10 +65,9 @@ class Retort < ActiveRecord::Base
     return emoji if emoji.blank?
 
     tone_suffix = emoji.match(/:t[1-6]\z/)&.to_s
-    emoji_name = tone_suffix.present? ? emoji.delete_suffix(tone_suffix) : emoji
+    canonical_name = Emoji[emoji]&.name
+    return emoji if canonical_name.blank?
 
-    canonical_name =
-      Emoji[emoji]&.name || Emoji[emoji_name]&.name || Emoji.resolve_alias(emoji_name)
     "#{canonical_name}#{tone_suffix}"
   end
 
