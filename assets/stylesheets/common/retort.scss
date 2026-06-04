@@ -38,6 +38,11 @@
 
   img {
     margin-right: 4px;
+
+    &.emoji {
+      height: 1.2em;
+      width: 1.2em;
+    }
   }
 
   &:hover .post-retort__tooltip {
